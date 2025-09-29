@@ -1,0 +1,149 @@
+<div class="p-6 space-y-6">
+  <!-- En-tête -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-foreground mb-2">Tableau de bord</h1>
+      <p class="text-muted-foreground">Vue d'ensemble de votre activité</p>
+    </div>
+    <button
+      (click)="refreshData()"
+      class="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg shadow-sm hover:shadow-md hover:bg-primary/90 transition-all"
+      [disabled]="isLoading()">
+      <i [class]="isLoading() ? 'fas fa-spinner fa-spin' : 'fas fa-sync'" class="text-sm"></i>
+      <span>Actualiser</span>
+    </button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-border/50">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-muted-foreground">Total Entreprises</p>
+          <p class="text-2xl font-bold text-foreground">{{ kpis().totalCompanies }}</p>
+        </div>
+        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center">
+          <i class="fas fa-building text-blue-600 dark:text-blue-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-border/50">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-muted-foreground">Chiffre d'affaires</p>
+          <p class="text-2xl font-bold text-foreground">{{ kpis().totalRevenue | number:'1.0-0':'fr-FR' }} XOF</p>
+        </div>
+        <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-xl flex items-center justify-center">
+          <i class="fas fa-chart-line text-green-600 dark:text-green-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-border/50">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-muted-foreground">Employés</p>
+          <p class="text-2xl font-bold text-foreground">{{ kpis().totalEmployees }}</p>
+        </div>
+        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-xl flex items-center justify-center">
+          <i class="fas fa-users text-purple-600 dark:text-purple-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-border/50">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-muted-foreground">Croissance</p>
+          <p class="text-2xl font-bold text-green-600">+{{ kpis().avgGrowth }}%</p>
+        </div>
+        <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-xl flex items-center justify-center">
+          <i class="fas fa-trending-up text-orange-600 dark:text-orange-400"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphiques -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Évolution mensuelle -->
+    <div class="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-border/50">
+      <app-line-chart
+        title="Évolution financière"
+        subtitle="Chiffre d'affaires vs Coûts sur 12 mois"
+        [labels]="monthlyEvolutionLabels()"
+        [datasets]="monthlyEvolutionDatasets()"
+        [height]="350"
+        [isLoading]="isLoading()"
+        [error]="error()"
+        [currency]="'XOF'"
+        [filled]="true"
+        [smooth]="true"
+        (chartClick)="onChartClick($event)"
+        (retry)="onRetryLoadData()">
+      </app-line-chart>
+    </div>
+
+    <!-- Créations d'entreprises -->
+    <div class="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-border/50">
+      <app-bar-chart
+        title="Entreprises créées"
+        subtitle="Nouvelles entreprises par mois"
+        [labels]="monthlyDistributionLabels()"
+        [datasets]="monthlyDistributionDatasets()"
+        [height]="350"
+        [isLoading]="isLoading()"
+        [error]="error()"
+        [showStats]="true"
+        (chartClick)="onChartClick($event)"
+        (retry)="onRetryLoadData()">
+      </app-bar-chart>
+    </div>
+  </div>
+
+  <!-- Répartition par types -->
+  <div class="bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-border/50">
+    <app-pie-chart
+      title="Répartition par forme juridique"
+      subtitle="Types d'entreprises dans votre portefeuille"
+      [labels]="typeDistributionLabels()"
+      [data]="typeDistributionData()"
+      [height]="400"
+      [isLoading]="isLoading()"
+      [error]="error()"
+      [variant]="'doughnut'"
+      [showLegendTable]="true"
+      [showStats]="true"
+      [cutout]="70"
+      (chartClick)="onChartClick($event)"
+      (retry)="onRetryLoadData()">
+    </app-pie-chart>
+  </div>
+
+  <!-- Section d'aide -->
+  <div class="bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-xl p-6 border border-primary/20">
+    <div class="flex items-start gap-4">
+      <div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-lightbulb text-primary text-lg"></i>
+      </div>
+      <div class="flex-1">
+        <h3 class="text-lg font-semibold text-foreground mb-2">Besoin d'aide ?</h3>
+        <p class="text-muted-foreground mb-4">
+          Explorez les graphiques interactifs ci-dessus pour analyser vos données.
+          Cliquez sur les éléments pour voir plus de détails ou exportez les graphiques au format image.
+        </p>
+        <div class="flex items-center gap-3">
+          <button class="text-primary hover:text-primary/80 text-sm font-medium">
+            <i class="fas fa-book mr-1"></i>
+            Guide d'utilisation
+          </button>
+          <button class="text-primary hover:text-primary/80 text-sm font-medium">
+            <i class="fas fa-question-circle mr-1"></i>
+            FAQ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

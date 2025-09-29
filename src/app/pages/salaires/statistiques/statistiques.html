@@ -1,0 +1,323 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Statistiques des Salaires</h1>
+      <p>Analysez les données de paie et les tendances de votre organisation</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="onRefresh()">
+        <i class="fas fa-sync-alt"></i>
+        Actualiser
+      </button>
+      <button class="btn btn-secondary" (click)="onExportDashboard()">
+        <i class="fas fa-file-excel"></i>
+        Export Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Overview -->
+  <div class="kpi-grid">
+    <div class="kpi-card primary">
+      <div class="kpi-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="kpi-content">
+        <h3>{{ metrics().overview.activeEmployees }}</h3>
+        <p>Employés actifs</p>
+        <div class="kpi-change positive">
+          <i class="fas fa-arrow-up"></i>
+          <span>+{{ metrics().overview.newEmployees }} nouveaux</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-card success">
+      <div class="kpi-icon">
+        <i class="fas fa-euro-sign"></i>
+      </div>
+      <div class="kpi-content">
+        <h3>{{ formatCurrency(metrics().overview.totalPayroll) }}</h3>
+        <p>Masse salariale mensuelle</p>
+        <div class="kpi-change" [class.positive]="metrics().overview.payrollGrowth > 0" [class.negative]="metrics().overview.payrollGrowth < 0">
+          <i class="fas" [class.fa-arrow-up]="metrics().overview.payrollGrowth > 0" [class.fa-arrow-down]="metrics().overview.payrollGrowth < 0"></i>
+          <span>{{ metrics().overview.payrollGrowth > 0 ? '+' : '' }}{{ metrics().overview.payrollGrowth.toFixed(1) }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-card warning">
+      <div class="kpi-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="kpi-content">
+        <h3>{{ formatCurrency(metrics().overview.avgMonthlySalary) }}</h3>
+        <p>Salaire moyen</p>
+        <div class="kpi-change neutral">
+          <i class="fas fa-equals"></i>
+          <span>Par employé</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-card info">
+      <div class="kpi-icon">
+        <i class="fas fa-percentage"></i>
+      </div>
+      <div class="kpi-content">
+        <h3>{{ calculateChargesPercentage().toFixed(1) }}%</h3>
+        <p>Charges sociales</p>
+        <div class="kpi-change neutral">
+          <i class="fas fa-info-circle"></i>
+          <span>Sur masse salariale</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Current vs Previous Period -->
+  <div class="comparison-section">
+    <div class="section-header">
+      <h2>Comparaison Mensuelle</h2>
+      <div class="period-info">
+        <span class="current-period">Mois actuel</span>
+        <span class="vs">vs</span>
+        <span class="previous-period">Mois précédent</span>
+      </div>
+    </div>
+
+    <div class="comparison-grid">
+      <div class="comparison-card">
+        <div class="comparison-header">
+          <h4>Salaire Brut Total</h4>
+        </div>
+        <div class="comparison-values">
+          <div class="current-value">
+            <span class="amount">{{ formatCurrency(metrics().payroll.currentMonth.totalGross) }}</span>
+            <span class="label">Actuel</span>
+          </div>
+          <div class="comparison-indicator">
+            <div class="change-arrow" [class.positive]="getGrossChange() > 0" [class.negative]="getGrossChange() < 0">
+              <i class="fas" [class.fa-arrow-up]="getGrossChange() > 0" [class.fa-arrow-down]="getGrossChange() < 0"></i>
+            </div>
+            <span class="change-percentage" [class.positive]="getGrossChange() > 0" [class.negative]="getGrossChange() < 0">
+              {{ getGrossChange() > 0 ? '+' : '' }}{{ getGrossChange().toFixed(1) }}%
+            </span>
+          </div>
+          <div class="previous-value">
+            <span class="amount">{{ formatCurrency(metrics().payroll.previousMonth.totalGross) }}</span>
+            <span class="label">Précédent</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comparison-card">
+        <div class="comparison-header">
+          <h4>Salaire Net Total</h4>
+        </div>
+        <div class="comparison-values">
+          <div class="current-value">
+            <span class="amount">{{ formatCurrency(metrics().payroll.currentMonth.totalNet) }}</span>
+            <span class="label">Actuel</span>
+          </div>
+          <div class="comparison-indicator">
+            <div class="change-arrow" [class.positive]="getNetChange() > 0" [class.negative]="getNetChange() < 0">
+              <i class="fas" [class.fa-arrow-up]="getNetChange() > 0" [class.fa-arrow-down]="getNetChange() < 0"></i>
+            </div>
+            <span class="change-percentage" [class.positive]="getNetChange() > 0" [class.negative]="getNetChange() < 0">
+              {{ getNetChange() > 0 ? '+' : '' }}{{ getNetChange().toFixed(1) }}%
+            </span>
+          </div>
+          <div class="previous-value">
+            <span class="amount">{{ formatCurrency(metrics().payroll.previousMonth.totalNet) }}</span>
+            <span class="label">Précédent</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comparison-card">
+        <div class="comparison-header">
+          <h4>Charges Sociales</h4>
+        </div>
+        <div class="comparison-values">
+          <div class="current-value">
+            <span class="amount">{{ formatCurrency(metrics().payroll.currentMonth.totalContributions) }}</span>
+            <span class="label">Actuel</span>
+          </div>
+          <div class="comparison-indicator">
+            <div class="change-arrow" [class.positive]="getContributionsChange() > 0" [class.negative]="getContributionsChange() < 0">
+              <i class="fas" [class.fa-arrow-up]="getContributionsChange() > 0" [class.fa-arrow-down]="getContributionsChange() < 0"></i>
+            </div>
+            <span class="change-percentage" [class.positive]="getContributionsChange() > 0" [class.negative]="getContributionsChange() < 0">
+              {{ getContributionsChange() > 0 ? '+' : '' }}{{ getContributionsChange().toFixed(1) }}%
+            </span>
+          </div>
+          <div class="previous-value">
+            <span class="amount">{{ formatCurrency(metrics().payroll.previousMonth.totalContributions) }}</span>
+            <span class="label">Précédent</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <div class="charts-grid">
+      <!-- Monthly Trends Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Évolution Mensuelle</h3>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-color gross"></div>
+              <span>Salaire Brut</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color net"></div>
+              <span>Salaire Net</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color contributions"></div>
+              <span>Charges</span>
+            </div>
+          </div>
+        </div>
+        <div class="chart-placeholder">
+          <div class="mock-chart">
+            @for (trend of metrics().monthlyTrends.slice(-6); track trend.month) {
+              <div class="chart-bar">
+                <div class="bar-group">
+                  <div class="bar gross" [style.height.%]="getBarHeight(trend.totalGross, 'max')"></div>
+                  <div class="bar net" [style.height.%]="getBarHeight(trend.totalNet, 'max')"></div>
+                  <div class="bar contributions" [style.height.%]="getBarHeight(trend.totalGross - trend.totalNet, 'charges')"></div>
+                </div>
+                <div class="bar-label">{{ trend.month.substring(0, 3) }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Department Distribution -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Répartition par Département</h3>
+        </div>
+        <div class="department-stats">
+          @for (dept of metrics().departments; track dept.department) {
+            <div class="department-item">
+              <div class="department-info">
+                <h5>{{ getDepartmentLabel(dept.department) }}</h5>
+                <div class="department-details">
+                  <span class="employee-count">{{ dept.employeeCount }} employé(s)</span>
+                  <span class="department-amount">{{ formatCurrency(dept.totalSalary) }}</span>
+                </div>
+              </div>
+              <div class="department-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="dept.percentageOfTotal"></div>
+                </div>
+                <span class="percentage">{{ dept.percentageOfTotal.toFixed(1) }}%</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contributions Breakdown -->
+  <div class="contributions-section">
+    <div class="section-header">
+      <h2>Détail des Contributions</h2>
+      <p>Répartition des charges sociales par organisme</p>
+    </div>
+
+    <div class="contributions-grid">
+      @for (contribution of metrics().contributions; track contribution.type) {
+        <div class="contribution-card">
+          <div class="contribution-header">
+            <h4>{{ contribution.name }}</h4>
+            <span class="contribution-rate">{{ contribution.percentage }}%</span>
+          </div>
+          <div class="contribution-amounts">
+            <div class="amount-item">
+              <span class="label">Part employé:</span>
+              <span class="value employee">{{ formatCurrency(contribution.totalEmployeeAmount) }}</span>
+            </div>
+            <div class="amount-item">
+              <span class="label">Part employeur:</span>
+              <span class="value employer">{{ formatCurrency(contribution.totalEmployerAmount) }}</span>
+            </div>
+            <div class="amount-item total">
+              <span class="label">Total:</span>
+              <span class="value total-amount">{{ formatCurrency(contribution.totalAmount) }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Year to Date Summary -->
+  <div class="ytd-section">
+    <div class="section-header">
+      <h2>Cumul Année en Cours</h2>
+      <p>Vue d'ensemble des totaux depuis le début de l'année</p>
+    </div>
+
+    <div class="ytd-grid">
+      <div class="ytd-card">
+        <div class="ytd-icon">
+          <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <div class="ytd-content">
+          <h4>{{ formatCurrency(metrics().payroll.yearToDate.totalGross) }}</h4>
+          <p>Salaire brut cumulé</p>
+        </div>
+      </div>
+
+      <div class="ytd-card">
+        <div class="ytd-icon">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="ytd-content">
+          <h4>{{ formatCurrency(metrics().payroll.yearToDate.totalNet) }}</h4>
+          <p>Salaire net cumulé</p>
+        </div>
+      </div>
+
+      <div class="ytd-card">
+        <div class="ytd-icon">
+          <i class="fas fa-university"></i>
+        </div>
+        <div class="ytd-content">
+          <h4>{{ formatCurrency(metrics().payroll.yearToDate.totalContributions) }}</h4>
+          <p>Contributions cumulées</p>
+        </div>
+      </div>
+
+      <div class="ytd-card">
+        <div class="ytd-icon">
+          <i class="fas fa-receipt"></i>
+        </div>
+        <div class="ytd-content">
+          <h4>{{ formatCurrency(metrics().payroll.yearToDate.totalTaxes) }}</h4>
+          <p>Impôts cumulés</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Chargement des statistiques...</p>
+      </div>
+    </div>
+  }
+</div>

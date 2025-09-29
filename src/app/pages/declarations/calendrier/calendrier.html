@@ -1,0 +1,300 @@
+<div class="calendrier-container">
+  <!-- Header avec métriques -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1><i class="fas fa-calendar-alt"></i> Calendrier des Déclarations</h1>
+        <p>Planifiez et suivez vos obligations déclaratives</p>
+      </div>
+      <div class="actions-section">
+        <button class="btn btn-outline" (click)="onExportCalendar()">
+          <i class="fas fa-download"></i>
+          Exporter
+        </button>
+        <button class="btn btn-primary" (click)="onCreateDeclaration()">
+          <i class="fas fa-plus"></i>
+          Nouvelle déclaration
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Métriques rapides -->
+  <div class="metrics-grid">
+    <div class="metric-card urgent" [class.animate]="showAnimations()">
+      <div class="metric-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="metric-content">
+        <div class="metric-value">{{ metrics().overview.overdueDeclarations }}</div>
+        <div class="metric-label">En retard</div>
+      </div>
+    </div>
+
+    <div class="metric-card warning" [class.animate]="showAnimations()">
+      <div class="metric-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="metric-content">
+        <div class="metric-value">{{ metrics().overview.upcomingDeclarations }}</div>
+        <div class="metric-label">À venir (30j)</div>
+      </div>
+    </div>
+
+    <div class="metric-card success" [class.animate]="showAnimations()">
+      <div class="metric-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="metric-content">
+        <div class="metric-value">{{ metrics().overview.submittedDeclarations }}</div>
+        <div class="metric-label">Soumises</div>
+      </div>
+    </div>
+
+    <div class="metric-card info" [class.animate]="showAnimations()">
+      <div class="metric-icon">
+        <i class="fas fa-percentage"></i>
+      </div>
+      <div class="metric-content">
+        <div class="metric-value">{{ metrics().overview.complianceRate | number:'1.0-1' }}%</div>
+        <div class="metric-label">Conformité</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu principal avec sidebar -->
+  <div class="main-content">
+    <!-- Sidebar avec filtres et deadlines -->
+    <div class="sidebar">
+      <!-- Filtres -->
+      <div class="filter-section">
+        <h3><i class="fas fa-filter"></i> Filtres</h3>
+
+        <div class="filter-group">
+          <label>Type de déclaration</label>
+          <select class="form-control" [(ngModel)]="selectedType" (change)="onFilterChange()">
+            <option value="">Tous les types</option>
+            <option value="tva">TVA</option>
+            <option value="dsn">DSN</option>
+            <option value="das2">DAS2</option>
+            <option value="liasse_fiscale">Liasse fiscale</option>
+            <option value="cnss">CNSS</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Statut</label>
+          <select class="form-control" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+            <option value="">Tous les statuts</option>
+            <option value="draft">Brouillon</option>
+            <option value="in_preparation">En préparation</option>
+            <option value="ready_to_submit">Prête à soumettre</option>
+            <option value="submitted">Soumise</option>
+            <option value="overdue">En retard</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Priorité</label>
+          <select class="form-control" [(ngModel)]="selectedPriority" (change)="onFilterChange()">
+            <option value="">Toutes les priorités</option>
+            <option value="urgent">Urgente</option>
+            <option value="high">Élevée</option>
+            <option value="medium">Moyenne</option>
+            <option value="low">Faible</option>
+          </select>
+        </div>
+
+        <button class="btn btn-outline btn-sm" (click)="onClearFilters()">
+          <i class="fas fa-times"></i>
+          Effacer les filtres
+        </button>
+      </div>
+
+      <!-- Échéances à venir -->
+      <div class="deadlines-section">
+        <h3><i class="fas fa-bell"></i> Échéances proches</h3>
+        @if (upcomingDeadlines().length > 0) {
+          <div class="deadlines-list">
+            @for (deadline of upcomingDeadlines(); track deadline.declarationId) {
+              <div class="deadline-item" [class]="getPriorityClass(deadline.priority)">
+                <div class="deadline-header">
+                  <span class="deadline-type">{{ getTypeLabel(deadline.type) }}</span>
+                  <span class="deadline-days">{{ deadline.daysRemaining }}j</span>
+                </div>
+                <div class="deadline-title">{{ deadline.title }}</div>
+                <div class="deadline-date">
+                  <i class="fas fa-calendar"></i>
+                  {{ formatDate(deadline.dueDate) }}
+                </div>
+                @if (deadline.amount) {
+                  <div class="deadline-amount">
+                    {{ formatCurrency(deadline.amount) }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-deadlines">
+            <i class="fas fa-calendar-check"></i>
+            <p>Aucune échéance proche</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Zone calendrier -->
+    <div class="calendar-section">
+      <!-- Navigation du calendrier -->
+      <div class="calendar-header">
+        <div class="calendar-nav">
+          <button class="nav-btn" (click)="previousMonth()">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <h2>{{ getCurrentMonthYear() }}</h2>
+          <button class="nav-btn" (click)="nextMonth()">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <div class="view-options">
+          <button class="view-btn" [class.active]="calendarView() === 'month'" (click)="setCalendarView('month')">
+            Mois
+          </button>
+          <button class="view-btn" [class.active]="calendarView() === 'week'" (click)="setCalendarView('week')">
+            Semaine
+          </button>
+        </div>
+      </div>
+
+      <!-- Grille du calendrier -->
+      <div class="calendar-grid" [class]="'calendar-' + calendarView()">
+        <!-- En-têtes des jours -->
+        <div class="calendar-weekdays">
+          @for (day of weekDays; track day) {
+            <div class="weekday-header">{{ day }}</div>
+          }
+        </div>
+
+        <!-- Jours du mois -->
+        <div class="calendar-days">
+          @for (week of calendarWeeks(); track $index) {
+            @for (day of week; track day.date) {
+              <div class="calendar-day"
+                   [class.other-month]="!day.isCurrentMonth"
+                   [class.today]="day.isToday"
+                   [class.has-events]="day.events.length > 0">
+
+                <div class="day-number">{{ day.dayNumber }}</div>
+
+                @if (day.events.length > 0) {
+                  <div class="day-events">
+                    @for (event of day.events; track event.id) {
+                      <div class="calendar-event"
+                           [class]="getEventClass(event)"
+                           [title]="event.title + ' - ' + getStatusLabel(event.status)"
+                           (click)="onEventClick(event)">
+                        <div class="event-time">{{ getEventTime(event) }}</div>
+                        <div class="event-title">{{ event.title }}</div>
+                        @if (event.isOverdue) {
+                          <i class="fas fa-exclamation-triangle event-warning"></i>
+                        }
+                      </div>
+                    }
+                    @if (day.events.length > 3) {
+                      <div class="more-events">
+                        +{{ day.events.length - 3 }} autres
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Légende -->
+      <div class="calendar-legend">
+        <div class="legend-item">
+          <div class="legend-color status-draft"></div>
+          <span>Brouillon</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color status-in-preparation"></div>
+          <span>En préparation</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color status-ready"></div>
+          <span>Prête</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color status-submitted"></div>
+          <span>Soumise</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color status-overdue"></div>
+          <span>En retard</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de détail d'événement -->
+  @if (selectedEvent()) {
+    <div class="modal-overlay" (click)="closeEventModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ selectedEvent()!.title }}</h3>
+          <button class="modal-close" (click)="closeEventModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="event-details">
+            <div class="detail-row">
+              <span class="label">Type:</span>
+              <span class="value">{{ getTypeLabel(selectedEvent()!.type) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Statut:</span>
+              <span class="value" [class]="getStatusClass(selectedEvent()!.status)">
+                {{ getStatusLabel(selectedEvent()!.status) }}
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Priorité:</span>
+              <span class="value" [class]="getPriorityClass(selectedEvent()!.priority)">
+                {{ getPriorityLabel(selectedEvent()!.priority) }}
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Échéance:</span>
+              <span class="value">{{ formatDate(selectedEvent()!.dueDate) }}</span>
+            </div>
+            @if (selectedEvent()!.amount) {
+              <div class="detail-row">
+                <span class="label">Montant:</span>
+                <span class="value">{{ formatCurrency(selectedEvent()!.amount!) }}</span>
+              </div>
+            }
+            @if (selectedEvent()!.isOverdue) {
+              <div class="detail-row warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Cette déclaration est en retard</span>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" (click)="closeEventModal()">
+            Fermer
+          </button>
+          <button class="btn btn-primary" (click)="editDeclaration(selectedEvent()!.declarationId)">
+            Modifier
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

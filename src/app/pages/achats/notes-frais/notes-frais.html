@@ -1,0 +1,353 @@
+<div class="max-w-7xl mx-auto p-6 space-y-8">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-foreground">Gestion des Notes de Frais</h1>
+      <p class="text-muted-foreground mt-1">Gérez les notes de frais et leurs validations</p>
+    </div>
+    <div class="flex gap-3">
+      <button
+        (click)="onExportExcel()"
+        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105">
+        <i class="fas fa-file-excel mr-2"></i>
+        Exporter Excel
+      </button>
+      <button
+        (click)="onCreateExpenseNote()"
+        class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105">
+        <i class="fas fa-plus mr-2"></i>
+        Nouvelle note
+      </button>
+    </div>
+  </div>
+
+  <!-- Métriques -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-orange-600 dark:text-orange-400 font-medium">En attente</p>
+          <p class="text-2xl font-bold text-orange-700 dark:text-orange-300">{{ formatCurrency(metrics().totalPending) }}</p>
+        </div>
+        <div class="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center">
+          <i class="fas fa-clock text-white text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-green-600 dark:text-green-400 font-medium">Approuvé ce mois</p>
+          <p class="text-2xl font-bold text-green-700 dark:text-green-300">{{ formatCurrency(metrics().approvedThisMonth) }}</p>
+        </div>
+        <div class="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center">
+          <i class="fas fa-check-circle text-white text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-blue-600 dark:text-blue-400 font-medium">Temps de traitement</p>
+          <p class="text-2xl font-bold text-blue-700 dark:text-blue-300">{{ metrics().averageProcessingTime }} j</p>
+        </div>
+        <div class="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center">
+          <i class="fas fa-hourglass-half text-white text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-red-600 dark:text-red-400 font-medium">Taux de rejet</p>
+          <p class="text-2xl font-bold text-red-700 dark:text-red-300">{{ metrics().rejectionRate }}%</p>
+        </div>
+        <div class="w-14 h-14 bg-red-500 rounded-2xl flex items-center justify-center">
+          <i class="fas fa-times-circle text-white text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphiques -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Dépenses par Employé -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300">
+      <h3 class="text-xl font-bold text-foreground mb-6 flex items-center">
+        <i class="fas fa-users text-blue-500 mr-3"></i>
+        Dépenses par Employé
+      </h3>
+      <div class="h-80">
+        <app-bar-chart
+          [labels]="chartData().employeeSpending.labels"
+          [datasets]="[{
+            label: 'Montant (k XOF)',
+            data: chartData().employeeSpending.data,
+            backgroundColor: [
+              '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+              '#06B6D4', '#84CC16', '#F97316'
+            ]
+          }]"
+          [borderRadius]="8"
+          [height]="320">
+        </app-bar-chart>
+      </div>
+    </div>
+
+    <!-- Répartition par Catégorie -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300">
+      <h3 class="text-xl font-bold text-foreground mb-6 flex items-center">
+        <i class="fas fa-chart-pie text-green-500 mr-3"></i>
+        Répartition par Catégorie
+      </h3>
+      <div class="h-80">
+        <app-pie-chart
+          [labels]="chartData().categoryDistribution.labels"
+          [data]="chartData().categoryDistribution.data"
+          [colors]="[
+            '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'
+          ]"
+          [height]="320">
+        </app-pie-chart>
+      </div>
+    </div>
+
+    <!-- Évolution Mensuelle -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300">
+      <h3 class="text-xl font-bold text-foreground mb-6 flex items-center">
+        <i class="fas fa-chart-line text-purple-500 mr-3"></i>
+        Évolution Mensuelle
+      </h3>
+      <div class="h-80">
+        <app-line-chart
+          [labels]="chartData().monthlyTrend.labels"
+          [datasets]="[{
+            label: 'Montant (k XOF)',
+            data: chartData().monthlyTrend.data,
+            borderColor: '#8B5CF6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            fill: true
+          }]"
+          [smooth]="true"
+          [filled]="true"
+          [height]="320">
+        </app-line-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et Actions -->
+  <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-2xl">
+    <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+      <!-- Recherche et Filtres -->
+      <div class="flex flex-col sm:flex-row gap-4 flex-1">
+        <!-- Recherche -->
+        <div class="relative flex-1 max-w-md">
+          <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"></i>
+          <input
+            type="text"
+            placeholder="Rechercher une note de frais..."
+            (input)="onSearchChange($event)"
+            class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-gray-600 transition-all duration-300">
+        </div>
+
+        <!-- Filtre par statut -->
+        <select
+          (change)="onStatusFilterChange($event)"
+          class="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300">
+          <option value="all">Tous les statuts</option>
+          <option value="draft">Brouillon</option>
+          <option value="submitted">Soumise</option>
+          <option value="approved">Approuvée</option>
+          <option value="rejected">Rejetée</option>
+          <option value="paid">Payée</option>
+        </select>
+
+        <!-- Filtre par employé -->
+        <select
+          (change)="onEmployeeFilterChange($event)"
+          class="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300">
+          <option value="all">Tous les employés</option>
+          @for (employee of availableEmployees(); track employee.id) {
+            <option [value]="employee.id">{{ employee.name }}</option>
+          }
+        </select>
+
+        <!-- Filtre par catégorie -->
+        <select
+          (change)="onCategoryFilterChange($event)"
+          class="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300">
+          <option value="all">Toutes les catégories</option>
+          <option value="transport">Transport</option>
+          <option value="accommodation">Hébergement</option>
+          <option value="meals">Repas</option>
+          <option value="supplies">Fournitures</option>
+          <option value="travel">Déplacement</option>
+          <option value="other">Autre</option>
+        </select>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3">
+        <button
+          (click)="onRefresh()"
+          [disabled]="isLoading()"
+          class="p-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-xl transition-all duration-300 disabled:opacity-50">
+          <i class="fas fa-sync-alt" [class.fa-spin]="isLoading()"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des notes de frais -->
+  @if (isLoading()) {
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-12 text-center shadow-2xl">
+      <i class="fas fa-spinner fa-spin text-4xl text-purple-500 mb-6"></i>
+      <p class="text-xl text-muted-foreground">Chargement des notes de frais...</p>
+    </div>
+  } @else if (filteredExpenseNotes().length === 0) {
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-12 text-center shadow-2xl">
+      <i class="fas fa-file-invoice-dollar text-6xl text-muted-foreground mb-6"></i>
+      <p class="text-2xl font-medium text-foreground mb-3">Aucune note de frais trouvée</p>
+      <p class="text-lg text-muted-foreground">Essayez de modifier vos critères de recherche</p>
+    </div>
+  } @else {
+    <!-- Mode grille -->
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      @for (note of filteredExpenseNotes(); track note.id) {
+        <div class="group bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:-translate-y-2">
+          <!-- Header note -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <span class="text-white font-bold text-sm">{{ getEmployeeInitials(note.employeeName) }}</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-foreground group-hover:text-purple-600 transition-colors">{{ note.noteNumber }}</h3>
+                <p class="text-sm text-muted-foreground">{{ note.employeeName }}</p>
+              </div>
+            </div>
+            <span
+              class="px-3 py-1 rounded-full text-sm font-bold shadow-sm"
+              [class]="note.status === 'approved' || note.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                       note.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                       note.status === 'submitted' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                       note.status === 'draft' ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400' :
+                       'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'">
+              {{ getStatusLabel(note.status) }}
+            </span>
+          </div>
+
+          <!-- Titre et description -->
+          <div class="mb-6">
+            <h4 class="font-semibold text-foreground mb-2 line-clamp-2">{{ note.title }}</h4>
+            <p class="text-sm text-muted-foreground line-clamp-3">{{ note.description }}</p>
+          </div>
+
+          <!-- Informations principales -->
+          <div class="space-y-3 mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-muted-foreground font-medium">Montant total:</span>
+              <span class="font-bold text-lg text-purple-600 dark:text-purple-400">{{ formatCurrency(note.totalAmount) }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-muted-foreground font-medium">Catégorie:</span>
+              <span class="font-medium text-foreground">{{ getCategoryLabel(note.category) }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-muted-foreground font-medium">Soumise le:</span>
+              <span class="font-medium text-foreground">{{ formatDate(note.submittedAt) }}</span>
+            </div>
+            @if (note.approvedAt) {
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-muted-foreground font-medium">Approuvée le:</span>
+                <span class="font-medium text-green-600 dark:text-green-400">{{ formatDate(note.approvedAt) }}</span>
+              </div>
+            }
+            @if (note.rejectedAt && note.rejectionReason) {
+              <div class="pt-2 border-t dark:border-gray-600">
+                <p class="text-sm text-red-600 dark:text-red-400 font-medium">Rejetée: {{ note.rejectionReason }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- Détail des dépenses -->
+          <div class="mb-6">
+            <p class="text-sm font-medium text-muted-foreground mb-3">Détail des dépenses ({{ note.expenses.length }})</p>
+            <div class="space-y-2 max-h-32 overflow-y-auto">
+              @for (expense of note.expenses.slice(0, 3); track expense.id) {
+                <div class="flex justify-between text-sm">
+                  <span class="text-foreground truncate flex-1 mr-2">{{ expense.description }}</span>
+                  <span class="font-medium text-purple-600 dark:text-purple-400">{{ formatCurrency(expense.amount) }}</span>
+                </div>
+              }
+              @if (note.expenses.length > 3) {
+                <p class="text-sm text-muted-foreground italic">+{{ note.expenses.length - 3 }} autres dépenses</p>
+              }
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2">
+            @if (note.status === 'submitted') {
+              <button
+                (click)="onApproveExpenseNote(note)"
+                class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-2 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 text-sm">
+                <i class="fas fa-check mr-2"></i>
+                Approuver
+              </button>
+              <button
+                (click)="onRejectExpenseNote(note)"
+                class="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 py-2 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 text-sm">
+                <i class="fas fa-times mr-2"></i>
+                Rejeter
+              </button>
+            } @else if (note.status === 'approved') {
+              <button
+                (click)="onPayExpenseNote(note)"
+                class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 py-2 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 text-sm">
+                <i class="fas fa-money-check-alt mr-2"></i>
+                Payer
+              </button>
+              <button
+                (click)="onEditExpenseNote(note)"
+                class="px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-300 rounded-xl font-semibold transition-all duration-300 hover:scale-105 text-sm">
+                <i class="fas fa-edit"></i>
+              </button>
+            } @else {
+              <button
+                (click)="onEditExpenseNote(note)"
+                class="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-3 py-2 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 text-sm">
+                <i class="fas fa-edit mr-2"></i>
+                Modifier
+              </button>
+              <button
+                (click)="onDeleteExpenseNote(note)"
+                class="px-3 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-800 dark:text-red-400 rounded-xl font-semibold transition-all duration-300 hover:scale-105 text-sm">
+                <i class="fas fa-trash"></i>
+              </button>
+            }
+          </div>
+
+          <!-- Pièces jointes -->
+          @if (note.attachments && note.attachments.length > 0) {
+            <div class="mt-4 pt-4 border-t dark:border-gray-700">
+              <p class="text-sm text-muted-foreground mb-2">Pièces jointes:</p>
+              <div class="flex flex-wrap gap-2">
+                @for (attachment of note.attachments; track attachment) {
+                  <span class="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded-lg">
+                    <i class="fas fa-paperclip mr-1"></i>
+                    {{ attachment }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

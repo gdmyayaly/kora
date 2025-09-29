@@ -1,0 +1,33 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "description": "Payment is pending",
+      "label": "Pending",
+      "value": "pending"
+    },
+    {
+      "description": "Payment completed successfully",
+      "label": "Completed",
+      "value": "completed"
+    },
+    {
+      "description": "Payment failed",
+      "label": "Failed",
+      "value": "failed"
+    },
+    {
+      "description": "Payment was cancelled",
+      "label": "Cancelled",
+      "value": "cancelled"
+    },
+    {
+      "description": "Payment was refunded",
+      "label": "Refunded",
+      "value": "refunded"
+    }
+  ],
+  "error": null,
+  "message": "Payment statuses retrieved successfully",
+  "success": true
+}

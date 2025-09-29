@@ -1,0 +1,189 @@
+<div class="container mx-auto px-4 py-6">
+  <!-- En-tête de la page -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-foreground">Entreprises</h1>
+      <p class="text-muted-foreground">Gérez toutes vos entreprises</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button
+        (click)="onRefresh()"
+        class="flex items-center gap-2 px-3 py-2 bg-card rounded-lg shadow-sm hover:shadow-md hover:bg-accent/50 transition-all"
+        [disabled]="isLoading()">
+        <i [class]="isLoading() ? 'fas fa-spinner fa-spin' : 'fas fa-sync'" class="text-sm"></i>
+        <span class="hidden sm:inline">Actualiser</span>
+      </button>
+      <button
+        (click)="onCreateCompany()"
+        class="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg shadow-sm hover:shadow-md hover:bg-primary/90 transition-all">
+        <i class="fas fa-plus"></i>
+        <span>Nouvelle entreprise</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Barre de recherche et filtres -->
+  <div class="flex flex-col sm:flex-row gap-4 mb-6">
+    <div class="flex-1 relative">
+      <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
+      <input
+        type="text"
+        placeholder="Rechercher une entreprise..."
+        (input)="onSearchChange($event)"
+        class="w-full pl-10 pr-4 py-2 bg-card rounded-lg shadow-sm hover:shadow-md focus:ring-2 focus:ring-primary focus:shadow-lg transition-all">
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-sm text-muted-foreground">Affichage:</span>
+      <div class="flex bg-card rounded-lg shadow-sm overflow-hidden">
+        <button
+          (click)="onViewModeChange('grid')"
+          [class.bg-primary]="viewMode() === 'grid'"
+          [class.text-primary-foreground]="viewMode() === 'grid'"
+          [class.shadow-inner]="viewMode() === 'grid'"
+          class="px-3 py-2 hover:bg-accent transition-all hover:shadow-sm">
+          <i class="fas fa-th"></i>
+        </button>
+        <button
+          (click)="onViewModeChange('list')"
+          [class.bg-primary]="viewMode() === 'list'"
+          [class.text-primary-foreground]="viewMode() === 'list'"
+          [class.shadow-inner]="viewMode() === 'list'"
+          class="px-3 py-2 hover:bg-accent transition-all hover:shadow-sm">
+          <i class="fas fa-list"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- État de chargement -->
+  @if (isLoading()) {
+    <div class="flex items-center justify-center py-12">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-spinner fa-spin text-primary"></i>
+        <span class="text-muted-foreground">Chargement des entreprises...</span>
+      </div>
+    </div>
+  }
+
+  <!-- Aucune entreprise -->
+  @else if (!filteredCompanies().length && !searchTerm()) {
+    <div class="text-center py-12">
+      <div class="mb-6">
+        <i class="fas fa-building text-6xl text-muted-foreground/50 mb-4"></i>
+        <h3 class="text-xl font-semibold mb-2">Aucune entreprise</h3>
+        <p class="text-muted-foreground mb-6">Créez votre première entreprise pour commencer</p>
+        <button
+          (click)="onCreateCompany()"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg shadow-sm hover:shadow-md hover:bg-primary/90 transition-all">
+          <i class="fas fa-plus"></i>
+          <span>Créer une entreprise</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Aucun résultat de recherche -->
+  @else if (!filteredCompanies().length && searchTerm()) {
+    <div class="text-center py-12">
+      <div class="mb-6">
+        <i class="fas fa-search text-4xl text-muted-foreground/50 mb-4"></i>
+        <h3 class="text-lg font-semibold mb-2">Aucun résultat</h3>
+        <p class="text-muted-foreground">Aucune entreprise ne correspond à votre recherche</p>
+      </div>
+    </div>
+  }
+
+  <!-- Liste des entreprises -->
+  @else {
+    <!-- Affichage en grille -->
+    @if (viewMode() === 'grid') {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @for (company of filteredCompanies(); track company.company_id) {
+          <div
+            class="bg-card rounded-xl p-6 shadow-sm hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer group transform hover:-translate-y-1"
+            (click)="onCompanyClick(company)">
+
+            <!-- En-tête de la carte -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:from-primary/20 group-hover:to-primary/10 transition-all duration-300">
+                <i class="fas fa-building text-primary text-lg"></i>
+              </div>
+              <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <button
+                  (click)="onViewCompany(company); $event.stopPropagation()"
+                  class="w-8 h-8 flex items-center justify-center hover:bg-accent rounded-lg transition-colors">
+                  <i class="fas fa-eye text-xs text-muted-foreground"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Informations de l'entreprise -->
+            <div class="space-y-3">
+              <div>
+                <h3 class="font-semibold text-foreground truncate" [title]="company.name">
+                  {{ company.name }}
+                </h3>
+                <p class="text-sm text-muted-foreground truncate" [title]="company.email">
+                  {{ company.email }}
+                </p>
+              </div>
+
+              @if (company.address) {
+                <div class="flex items-start gap-2">
+                  <i class="fas fa-map-marker-alt text-muted-foreground text-xs mt-1"></i>
+                  <span class="text-sm text-muted-foreground line-clamp-2">{{ company.address }}</span>
+                </div>
+              }
+
+              @if (company.phone) {
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-phone text-muted-foreground text-xs"></i>
+                  <span class="text-sm text-muted-foreground">{{ company.phone }}</span>
+                </div>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Affichage en liste -->
+    @else {
+      <div class="bg-card rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+        <div class="divide-y divide-accent/30">
+          @for (company of filteredCompanies(); track company.company_id) {
+            <div
+              class="p-4 hover:bg-accent/30 transition-all cursor-pointer group"
+              (click)="onCompanyClick(company)">
+
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                  <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
+                    <i class="fas fa-building text-primary"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <h3 class="font-semibold truncate">{{ company.name }}</h3>
+                    </div>
+                    <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>{{ company.email }}</span>
+                      <span>{{ company.legal_form || 'Non défini' }}</span>
+                      @if (company.created_at) {
+                        <span>Créée le {{ formatDate(company.created_at) }}</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div class="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                  <i class="fas fa-eye mr-1"></i>
+                  Détails
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

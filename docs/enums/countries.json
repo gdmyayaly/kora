@@ -1,0 +1,128 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "code": "SN",
+      "label": "Sénégal",
+      "region": "West Africa",
+      "value": "Sénégal"
+    },
+    {
+      "code": "ML",
+      "label": "Mali",
+      "region": "West Africa",
+      "value": "Mali"
+    },
+    {
+      "code": "BF",
+      "label": "Burkina Faso",
+      "region": "West Africa",
+      "value": "Burkina Faso"
+    },
+    {
+      "code": "CI",
+      "label": "Côte d'Ivoire",
+      "region": "West Africa",
+      "value": "Côte d'Ivoire"
+    },
+    {
+      "code": "NE",
+      "label": "Niger",
+      "region": "West Africa",
+      "value": "Niger"
+    },
+    {
+      "code": "GW",
+      "label": "Guinée-Bissau",
+      "region": "West Africa",
+      "value": "Guinée-Bissau"
+    },
+    {
+      "code": "TG",
+      "label": "Togo",
+      "region": "West Africa",
+      "value": "Togo"
+    },
+    {
+      "code": "BJ",
+      "label": "Bénin",
+      "region": "West Africa",
+      "value": "Bénin"
+    },
+    {
+      "code": "FR",
+      "label": "France",
+      "region": "Europe",
+      "value": "France"
+    },
+    {
+      "code": "CA",
+      "label": "Canada",
+      "region": "North America",
+      "value": "Canada"
+    },
+    {
+      "code": "US",
+      "label": "United States",
+      "region": "North America",
+      "value": "United States"
+    },
+    {
+      "code": "GB",
+      "label": "United Kingdom",
+      "region": "Europe",
+      "value": "United Kingdom"
+    },
+    {
+      "code": "DE",
+      "label": "Germany",
+      "region": "Europe",
+      "value": "Germany"
+    },
+    {
+      "code": "ES",
+      "label": "Spain",
+      "region": "Europe",
+      "value": "Spain"
+    },
+    {
+      "code": "IT",
+      "label": "Italy",
+      "region": "Europe",
+      "value": "Italy"
+    },
+    {
+      "code": "MA",
+      "label": "Morocco",
+      "region": "North Africa",
+      "value": "Morocco"
+    },
+    {
+      "code": "DZ",
+      "label": "Algeria",
+      "region": "North Africa",
+      "value": "Algeria"
+    },
+    {
+      "code": "TN",
+      "label": "Tunisia",
+      "region": "North Africa",
+      "value": "Tunisia"
+    },
+    {
+      "code": "GH",
+      "label": "Ghana",
+      "region": "West Africa",
+      "value": "Ghana"
+    },
+    {
+      "code": "NG",
+      "label": "Nigeria",
+      "region": "West Africa",
+      "value": "Nigeria"
+    }
+  ],
+  "error": null,
+  "message": "Countries retrieved successfully",
+  "success": true
+}

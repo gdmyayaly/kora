@@ -1,0 +1,255 @@
+<div class="max-w-4xl mx-auto space-y-8">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-foreground">Mon profil</h1>
+      <p class="text-muted-foreground mt-1">Gérez vos informations personnelles et paramètres de sécurité</p>
+    </div>
+  </div>
+
+  <div class="grid gap-8 lg:grid-cols-3">
+    <!-- Informations personnelles -->
+    <div class="lg:col-span-2">
+      <div class="bg-card border rounded-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-semibold text-foreground">Informations personnelles</h2>
+          <button
+            (click)="toggleEdit()"
+            class="px-4 py-2 rounded-lg transition-colors"
+            [class.bg-primary]="!isEditing()"
+            [class.text-primary-foreground]="!isEditing()"
+            [class.bg-muted]="isEditing()"
+            [class.text-muted-foreground]="isEditing()">
+            @if (isEditing()) {
+              <i class="fas fa-times mr-2"></i>
+              Annuler
+            } @else {
+              <i class="fas fa-edit mr-2"></i>
+              Modifier
+            }
+          </button>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <div class="grid gap-6 md:grid-cols-2">
+            <!-- Prénom -->
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Prénom</label>
+              <input
+                formControlName="first_name"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                [class.border-destructive]="profileForm.get('first_name')?.invalid && profileForm.get('first_name')?.touched"
+              />
+              @if (profileForm.get('first_name')?.invalid && profileForm.get('first_name')?.touched) {
+                <p class="text-destructive text-sm mt-1">Le prénom est requis</p>
+              }
+            </div>
+
+            <!-- Nom -->
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Nom</label>
+              <input
+                formControlName="last_name"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                [class.border-destructive]="profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched"
+              />
+              @if (profileForm.get('last_name')?.invalid && profileForm.get('last_name')?.touched) {
+                <p class="text-destructive text-sm mt-1">Le nom est requis</p>
+              }
+            </div>
+
+            <!-- Nom d'affichage -->
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Nom d'affichage</label>
+              <input
+                formControlName="display_name"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                [class.border-destructive]="profileForm.get('display_name')?.invalid && profileForm.get('display_name')?.touched"
+              />
+              @if (profileForm.get('display_name')?.invalid && profileForm.get('display_name')?.touched) {
+                <p class="text-destructive text-sm mt-1">Le nom d'affichage est requis</p>
+              }
+            </div>
+
+            <!-- Email (lecture seule) -->
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Adresse email</label>
+              <input
+                formControlName="email"
+                type="email"
+                readonly
+                class="w-full px-3 py-2 border rounded-lg bg-muted text-muted-foreground cursor-not-allowed"
+              />
+              <p class="text-muted-foreground text-xs mt-1">L'email ne peut pas être modifié</p>
+            </div>
+
+            <!-- Téléphone -->
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Téléphone</label>
+              <input
+                formControlName="phone"
+                type="tel"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                placeholder="+221 77 123 45 67"
+              />
+            </div>
+
+            <!-- Adresse ligne 1 -->
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Adresse</label>
+              <input
+                formControlName="address_line1"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                placeholder="VDN, Cité Keur Gorgui"
+              />
+            </div>
+
+            <!-- Adresse ligne 2 -->
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Complément d'adresse</label>
+              <input
+                formControlName="address_line2"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                placeholder="Villa 123, 2ème étage"
+              />
+            </div>
+
+            <!-- Ville -->
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Ville</label>
+              <input
+                formControlName="city"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                placeholder="Dakar"
+              />
+            </div>
+
+            <!-- Code postal -->
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Code postal</label>
+              <input
+                formControlName="postal_code"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                placeholder="12500"
+              />
+            </div>
+
+            <!-- Pays -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-foreground mb-2">Pays</label>
+              <input
+                formControlName="country"
+                type="text"
+                class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                placeholder="Sénégal"
+              />
+            </div>
+          </div>
+
+          <!-- Boutons d'action -->
+          @if (isEditing()) {
+            <div class="flex gap-4 mt-6">
+              <button
+                type="submit"
+                [disabled]="isLoading() || profileForm.invalid"
+                class="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                @if (isLoading()) {
+                  <i class="fas fa-spinner fa-spin mr-2"></i>
+                  Enregistrement...
+                } @else {
+                  <i class="fas fa-save mr-2"></i>
+                  Enregistrer
+                }
+              </button>
+              <button
+                type="button"
+                (click)="cancelEdit()"
+                class="bg-muted text-muted-foreground px-6 py-2 rounded-lg hover:bg-muted/80 transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Annuler
+              </button>
+            </div>
+          }
+        </form>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Avatar -->
+      <div class="bg-card border rounded-lg p-6 text-center">
+        <div class="w-24 h-24 bg-primary rounded-full mx-auto mb-4 flex items-center justify-center">
+          @if (authService.user()?.avatar) {
+            <img [src]="authService.user()?.avatar" [alt]="authService.user()?.name" class="w-full h-full rounded-full object-cover">
+          } @else {
+            <span class="text-primary-foreground text-2xl font-medium">
+              {{ (authService.user()?.firstName?.charAt(0) || '') + (authService.user()?.lastName?.charAt(0) || '') }}
+            </span>
+          }
+        </div>
+        <h3 class="font-semibold text-foreground">{{ authService.user()?.name || 'Utilisateur' }}</h3>
+        <p class="text-muted-foreground text-sm">{{ authService.user()?.email }}</p>
+        <button class="mt-4 text-primary hover:text-primary/80 text-sm transition-colors">
+          <i class="fas fa-camera mr-2"></i>
+          Changer l'avatar
+        </button>
+      </div>
+
+      <!-- Sécurité -->
+      <div class="bg-card border rounded-lg p-6">
+        <h3 class="font-semibold text-foreground mb-4">Sécurité</h3>
+        <div class="space-y-4">
+          @for (section of securitySections; track section.title) {
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <i [class]="section.icon" class="text-primary text-sm"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-foreground text-sm">{{ section.title }}</p>
+                  <p class="text-muted-foreground text-xs">{{ section.description }}</p>
+                </div>
+              </div>
+              <button
+                (click)="section.handler()"
+                class="text-primary hover:text-primary/80 text-sm transition-colors">
+                {{ section.action }}
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Statistiques -->
+      <div class="bg-card border rounded-lg p-6">
+        <h3 class="font-semibold text-foreground mb-4">Activité</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-muted-foreground text-sm">Dernière connexion</span>
+            <span class="text-foreground text-sm">Aujourd'hui</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground text-sm">Membre depuis</span>
+            <span class="text-foreground text-sm">Mars 2024</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-muted-foreground text-sm">Sessions actives</span>
+            <span class="text-foreground text-sm">2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de changement de mot de passe -->
+  @if (showPasswordModal()) {
+    <app-change-password-modal (closed)="closePasswordModal()"></app-change-password-modal>
+  }
+</div>

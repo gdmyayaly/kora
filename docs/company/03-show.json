@@ -1,0 +1,39 @@
+{
+  "code": 200,
+  "data": {
+    "address": "Dakar Sénégal",
+    "city": "Dakar",
+    "company_id": "fb7597f2-b24f-4e41-b4bb-67f0105edc32",
+    "country": "Sénégal",
+    "created_at": "2025-09-28T14:01:57.600332+00:00",
+    "currency": "XOF",
+    "description": "Aucune",
+    "email": "rien@gmail.com",
+    "fiscal_number": "A01",
+    "legal_form": "sarl",
+    "name": "YimaCore",
+    "owner_id": "b989fec3-719c-4d6f-a283-31661f25e405",
+    "permissions": [
+      "company:create",
+      "company:read",
+      "company:update",
+      "company:manage",
+      "company:delete",
+      "workspace:manage",
+      "employee:create",
+      "employee:read",
+      "employee:update",
+      "employee:manage",
+      "employee:delete"
+    ],
+    "phone": "772652363",
+    "postal_code": "15000",
+    "role": "Owner",
+    "updated_at": "2025-09-28T14:01:57.600339+00:00",
+    "website": "https://yayaly.xyz/",
+    "workspace_id": "2003e2b5-791e-4516-a9e0-cc3e682d148a"
+  },
+  "error": null,
+  "message": "Company details retrieved successfully",
+  "success": true
+}

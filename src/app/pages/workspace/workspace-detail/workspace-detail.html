@@ -1,0 +1,299 @@
+@if (workspace(); as ws) {
+  <div class="container mx-auto px-4 py-6 max-w-6xl">
+    <!-- En-tête -->
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-4">
+        <button
+          (click)="onBack()"
+          class="p-2 hover:bg-accent/50 rounded-lg transition-colors">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <div>
+          <h1 class="text-2xl font-bold text-foreground flex items-center gap-3">
+            {{ ws.name }}
+            @if (ws.is_default) {
+              <span class="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">Défaut</span>
+            }
+            @if (ws.is_owner) {
+              <i class="fas fa-crown text-yellow-500 text-lg"></i>
+            }
+          </h1>
+          <p class="text-muted-foreground">{{ getRoleDisplayName(ws.role) }} • Créé le {{ formatDate(ws.created_at) }}</p>
+        </div>
+      </div>
+
+      @if (!isEditing()) {
+        <div class="flex items-center gap-2">
+          @if (ws.is_owner) {
+            <button
+              (click)="onEdit()"
+              class="flex items-center gap-2 px-4 py-2 bg-accent/50 hover:bg-accent/80 rounded-lg transition-colors shadow-sm hover:shadow-md">
+              <i class="fas fa-edit"></i>
+              <span>Modifier</span>
+            </button>
+          }
+          @if (!ws.is_default && ws.is_owner) {
+            <button
+              (click)="onSetDefault()"
+              [disabled]="isLoading()"
+              class="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="fas fa-star"></i>
+              <span>Défaut</span>
+            </button>
+          }
+          @if (ws.is_owner) {
+            <button
+              (click)="onShowDeleteModal()"
+              class="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg transition-colors shadow-sm hover:shadow-md">
+              <i class="fas fa-trash"></i>
+              <span>Supprimer</span>
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Informations principales -->
+      <div class="lg:col-span-2">
+        @if (isEditing()) {
+          <!-- Mode édition -->
+          <div class="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <i class="fas fa-edit text-primary"></i>
+              Modifier le workspace
+            </h2>
+
+            <form [formGroup]="editForm" class="space-y-6">
+              <div>
+                <label for="name" class="block text-sm font-medium mb-2">
+                  Nom du workspace <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  formControlName="name"
+                  placeholder="Nom du workspace"
+                  [class.border-red-500]="isFieldInvalid('name')"
+                  class="w-full px-3 py-2 bg-background border-0 rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:shadow-md transition-all">
+                @if (isFieldInvalid('name')) {
+                  <p class="text-red-500 text-sm mt-1">{{ getFieldError('name') }}</p>
+                }
+              </div>
+
+              <div>
+                <label for="description" class="block text-sm font-medium mb-2">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  formControlName="description"
+                  placeholder="Description du workspace (optionnel)"
+                  rows="3"
+                  [class.border-red-500]="isFieldInvalid('description')"
+                  class="w-full px-3 py-2 bg-background border-0 rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:shadow-md transition-all resize-none"></textarea>
+                @if (isFieldInvalid('description')) {
+                  <p class="text-red-500 text-sm mt-1">{{ getFieldError('description') }}</p>
+                }
+              </div>
+
+              <div class="flex items-center justify-between pt-4 border-t">
+                <button
+                  type="button"
+                  (click)="onCancelEdit()"
+                  class="px-4 py-2 bg-accent/50 hover:bg-accent/80 rounded-lg transition-colors shadow-sm hover:shadow-md">
+                  Annuler
+                </button>
+                <button
+                  type="button"
+                  (click)="onSaveEdit()"
+                  [disabled]="editForm.invalid || isSubmitting()"
+                  class="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                  @if (isSubmitting()) {
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Enregistrement...</span>
+                  } @else {
+                    <i class="fas fa-save"></i>
+                    <span>Enregistrer</span>
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        } @else {
+          <!-- Mode lecture -->
+          <div class="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <i class="fas fa-info-circle text-primary"></i>
+              Informations du workspace
+            </h2>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-muted-foreground mb-1">Nom</label>
+                <p class="text-lg font-medium">{{ ws.name }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-muted-foreground mb-1">ID du workspace</label>
+                <p class="text-sm font-mono bg-accent/30 px-2 py-1 rounded">{{ ws.workspace_id }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-muted-foreground mb-1">Propriétaire</label>
+                <p class="text-sm font-mono bg-accent/30 px-2 py-1 rounded">{{ ws.owner_id }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-muted-foreground mb-1">Date de création</label>
+                <p>{{ formatDate(ws.created_at) }}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Sidebar avec statistiques et actions -->
+      <div class="space-y-6">
+        <!-- Statistiques -->
+        <div class="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <i class="fas fa-chart-bar text-primary"></i>
+            Statistiques
+          </h3>
+
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                  <i class="fas fa-building text-blue-600 dark:text-blue-400 text-sm"></i>
+                </div>
+                <span class="text-sm text-muted-foreground">Entreprises</span>
+              </div>
+              <span class="font-semibold">{{ ws.companies_count }}</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                  <i class="fas fa-user text-green-600 dark:text-green-400 text-sm"></i>
+                </div>
+                <span class="text-sm text-muted-foreground">Votre rôle</span>
+              </div>
+              <span class="font-semibold">{{ getRoleDisplayName(ws.role) }}</span>
+            </div>
+
+            @if (ws.is_default) {
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                    <i class="fas fa-star text-yellow-600 dark:text-yellow-400 text-sm"></i>
+                  </div>
+                  <span class="text-sm text-muted-foreground">Par défaut</span>
+                </div>
+                <span class="font-semibold text-primary">Oui</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Permissions -->
+        @if (ws.permissions && ws.permissions.length > 0) {
+          <div class="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <i class="fas fa-shield-alt text-primary"></i>
+              Permissions
+            </h3>
+
+            <div class="space-y-2">
+              @for (permission of ws.permissions; track permission) {
+                <div class="flex items-center gap-2 text-sm">
+                  <i class="fas fa-check text-green-500 text-xs"></i>
+                  <span>{{ permission }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de suppression -->
+  @if (showDeleteModal()) {
+    <div class="fixed inset-0 z-[60] overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4 py-6">
+        <!-- Overlay -->
+        <div
+          class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+          (click)="onCloseDeleteModal()"></div>
+
+        <!-- Modal -->
+        <div class="relative bg-card rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all max-w-lg w-full p-6">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 sm:mx-0 sm:h-10 sm:w-10">
+              <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-foreground">
+                Supprimer le workspace
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-muted-foreground">
+                  Êtes-vous sûr de vouloir supprimer le workspace "{{ ws.name }}" ?
+                  Cette action est irréversible et supprimera toutes les données associées.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              (click)="onConfirmDelete()"
+              [disabled]="isDeleting()"
+              class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+              @if (isDeleting()) {
+                <i class="fas fa-spinner fa-spin mr-2"></i>
+                Suppression...
+              } @else {
+                Supprimer
+              }
+            </button>
+            <button
+              type="button"
+              (click)="onCloseDeleteModal()"
+              [disabled]="isDeleting()"
+              class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-background text-base font-medium text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+} @else if (isLoading()) {
+  <!-- État de chargement -->
+  <div class="container mx-auto px-4 py-6">
+    <div class="flex items-center justify-center py-12">
+      <div class="text-center">
+        <i class="fas fa-spinner fa-spin text-3xl text-muted-foreground mb-4"></i>
+        <p class="text-muted-foreground">Chargement du workspace...</p>
+      </div>
+    </div>
+  </div>
+} @else {
+  <!-- Erreur - workspace non trouvé -->
+  <div class="container mx-auto px-4 py-6">
+    <div class="text-center py-12">
+      <i class="fas fa-exclamation-triangle text-4xl text-muted-foreground/50 mb-4"></i>
+      <h2 class="text-xl font-semibold mb-2">Workspace non trouvé</h2>
+      <p class="text-muted-foreground mb-6">Le workspace demandé n'existe pas ou vous n'avez pas les permissions pour l'afficher.</p>
+      <button
+        (click)="onBack()"
+        class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+        <i class="fas fa-arrow-left"></i>
+        <span>Retour aux workspaces</span>
+      </button>
+    </div>
+  </div>
+}

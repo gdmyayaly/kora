@@ -1,0 +1,62 @@
+{
+  "code": 200,
+  "data": {
+    "authenticated_user": {
+      "email": "devyayaly@gmail.com",
+      "first_name": "Aliou",
+      "last_name": "Ka",
+      "user_id": "b989fec3-719c-4d6f-a283-31661f25e405"
+    },
+    "is_trial_user": true,
+    "total_users": 1,
+    "users": [
+      {
+        "company_memberships": [
+          {
+            "companies": {
+              "name": "YimaCore",
+              "status": "active"
+            },
+            "company_id": "fb7597f2-b24f-4e41-b4bb-67f0105edc32",
+            "created_at": "2025-09-28T14:01:57.692781+00:00",
+            "is_active": true,
+            "role_id": "ecf36803-f69e-42b5-a37f-91ce7c12e75e",
+            "roles": {
+              "display_name": "Owner",
+              "name": "owner"
+            }
+          }
+        ],
+        "created_at": "2025-09-28T11:52:59.115534+00:00",
+        "email": "devyayaly@gmail.com",
+        "first_name": "Aliou",
+        "id": "b989fec3-719c-4d6f-a283-31661f25e405",
+        "is_current_user": true,
+        "is_trial_user": true,
+        "last_name": "Ka",
+        "package_name": "Trial",
+        "phone": "772652363",
+        "subscription_status": "trial",
+        "updated_at": "2025-09-28T11:52:59.556205+00:00",
+        "workspace_memberships": [
+          {
+            "created_at": "2025-09-28T11:52:59.652642+00:00",
+            "role_id": "ecf36803-f69e-42b5-a37f-91ce7c12e75e",
+            "roles": {
+              "display_name": "Owner",
+              "name": "owner"
+            },
+            "workspace_id": "2003e2b5-791e-4516-a9e0-cc3e682d148a",
+            "workspaces": {
+              "is_default": true,
+              "name": "Yaya Ly's Workspace"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "error": null,
+  "message": "Users retrieved successfully",
+  "success": true
+}

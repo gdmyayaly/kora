@@ -1,0 +1,21 @@
+{
+  "code": 201,
+  "data": {
+    "created_at": "Sun, 28 Sep 2025 11:52:59 GMT",
+    "email": "devyayaly@gmail.com",
+    "email_confirmed_at": null,
+    "id": "b989fec3-719c-4d6f-a283-31661f25e405",
+    "setup_completed": true,
+    "setup_details": {
+      "invoice_created": true,
+      "package_assigned": true,
+      "profile_created": true,
+      "subscription_created": true,
+      "workspace_created": true
+    },
+    "setup_message": "New user setup completed successfully"
+  },
+  "error": null,
+  "message": "User registered successfully",
+  "success": true
+}

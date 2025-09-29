@@ -1,0 +1,285 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Bulletins de Paie</h1>
+      <p>Consultez et gérez les bulletins de paie de vos employés</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="onRefresh()">
+        <i class="fas fa-sync-alt"></i>
+        Actualiser
+      </button>
+      <button class="btn btn-secondary" (click)="onExportExcel()">
+        <i class="fas fa-file-excel"></i>
+        Export Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-icon">
+        <i class="fas fa-file-alt"></i>
+      </div>
+      <div class="summary-content">
+        <h3>{{ filteredPaySlips().length }}</h3>
+        <p>Total bulletins</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon generated">
+        <i class="fas fa-file-contract"></i>
+      </div>
+      <div class="summary-content">
+        <h3>{{ getPaySlipsByStatus('generated').length }}</h3>
+        <p>Bulletins générés</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon sent">
+        <i class="fas fa-paper-plane"></i>
+      </div>
+      <div class="summary-content">
+        <h3>{{ getPaySlipsByStatus('sent').length }}</h3>
+        <p>Bulletins envoyés</p>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon acknowledged">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="summary-content">
+        <h3>{{ getPaySlipsByStatus('acknowledged').length }}</h3>
+        <p>Bulletins confirmés</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-section">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Rechercher un bulletin..."
+            [value]="searchTerm()"
+            (input)="onSearchChange($event)"
+          >
+        </div>
+      </div>
+
+      <div class="filters-section">
+        <select [value]="selectedPeriod()" (change)="onPeriodFilterChange($event)">
+          <option value="all">Toutes les périodes</option>
+          @for (period of availablePeriods(); track period) {
+            <option [value]="period">{{ period }}</option>
+          }
+        </select>
+
+        <select [value]="selectedStatus()" (change)="onStatusFilterChange($event)">
+          <option value="all">Tous les statuts</option>
+          <option value="draft">Brouillon</option>
+          <option value="generated">Généré</option>
+          <option value="sent">Envoyé</option>
+          <option value="acknowledged">Confirmé</option>
+          <option value="disputed">Contesté</option>
+        </select>
+
+        <select [value]="selectedEmployee()" (change)="onEmployeeFilterChange($event)">
+          <option value="all">Tous les employés</option>
+          @for (employee of availableEmployees(); track employee) {
+            <option [value]="employee">{{ employee }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="action-section">
+        <button class="btn btn-success" (click)="onGenerateAll()" [disabled]="filteredPaySlips().length === 0">
+          <i class="fas fa-file-plus"></i>
+          Générer tous
+        </button>
+        <button class="btn btn-primary" (click)="onSendAll()" [disabled]="getGeneratedPaySlips().length === 0">
+          <i class="fas fa-paper-plane"></i>
+          Envoyer tous
+        </button>
+      </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    @if (selectedPaySlips().length > 0) {
+      <div class="bulk-actions">
+        <div class="selection-info">
+          <span>{{ selectedPaySlips().length }} bulletin(s) sélectionné(s)</span>
+        </div>
+        <div class="bulk-buttons">
+          <button class="btn btn-success" (click)="onBulkGenerate()">
+            <i class="fas fa-file-plus"></i>
+            Générer sélection
+          </button>
+          <button class="btn btn-primary" (click)="onBulkSend()">
+            <i class="fas fa-paper-plane"></i>
+            Envoyer sélection
+          </button>
+          <button class="btn btn-warning" (click)="onBulkDownload()">
+            <i class="fas fa-download"></i>
+            Télécharger PDF
+          </button>
+          <button class="btn btn-secondary" (click)="onClearSelection()">
+            <i class="fas fa-times"></i>
+            Désélectionner
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Chargement des bulletins de paie...</p>
+      </div>
+    }
+
+    <!-- Content -->
+    @if (!isLoading()) {
+      @if (filteredPaySlips().length === 0) {
+        <div class="empty-state">
+          <i class="fas fa-file-alt fa-3x"></i>
+          <h3>Aucun bulletin trouvé</h3>
+          <p>Aucun bulletin de paie ne correspond à vos critères</p>
+          <button class="btn btn-primary" (click)="onGenerateAll()">
+            <i class="fas fa-plus"></i>
+            Générer bulletins
+          </button>
+        </div>
+      } @else {
+        <div class="payslips-table">
+          <!-- Table Header -->
+          <div class="table-header">
+            <div class="header-cell checkbox-cell">
+              <input
+                type="checkbox"
+                [checked]="isAllSelected()"
+                [indeterminate]="isPartiallySelected()"
+                (change)="onToggleSelectAll()"
+              >
+            </div>
+            <div class="header-cell sortable" (click)="onSort('paySlipNumber')">
+              N° Bulletin
+              <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'paySlipNumber' && sortOrder() === 'asc'"
+                 [class.fa-sort-down]="sortBy() === 'paySlipNumber' && sortOrder() === 'desc'"></i>
+            </div>
+            <div class="header-cell sortable" (click)="onSort('employee')">
+              Employé
+              <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'employee' && sortOrder() === 'asc'"
+                 [class.fa-sort-down]="sortBy() === 'employee' && sortOrder() === 'desc'"></i>
+            </div>
+            <div class="header-cell sortable" (click)="onSort('period')">
+              Période
+              <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'period' && sortOrder() === 'asc'"
+                 [class.fa-sort-down]="sortBy() === 'period' && sortOrder() === 'desc'"></i>
+            </div>
+            <div class="header-cell sortable" (click)="onSort('grossSalary')">
+              Salaire Brut
+              <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'grossSalary' && sortOrder() === 'asc'"
+                 [class.fa-sort-down]="sortBy() === 'grossSalary' && sortOrder() === 'desc'"></i>
+            </div>
+            <div class="header-cell sortable" (click)="onSort('netSalary')">
+              Salaire Net
+              <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'netSalary' && sortOrder() === 'asc'"
+                 [class.fa-sort-down]="sortBy() === 'netSalary' && sortOrder() === 'desc'"></i>
+            </div>
+            <div class="header-cell">Statut</div>
+            <div class="header-cell">Actions</div>
+          </div>
+
+          <!-- Table Rows -->
+          @for (paySlip of filteredPaySlips(); track paySlip.id) {
+            <div class="table-row" [class.selected]="isSelected(paySlip)">
+              <div class="table-cell checkbox-cell">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(paySlip)"
+                  (change)="onToggleSelect(paySlip)"
+                >
+              </div>
+              <div class="table-cell">
+                <span class="payslip-number">{{ paySlip.paySlipNumber }}</span>
+              </div>
+              <div class="table-cell employee-cell">
+                <div class="employee-info">
+                  <div class="employee-avatar">
+                    <span>{{ getEmployeeInitials(paySlip.employeeName) }}</span>
+                  </div>
+                  <div class="employee-details">
+                    <h5>{{ paySlip.employeeName }}</h5>
+                    <p>{{ paySlip.employeeId }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="table-cell">
+                <span class="period-info">{{ paySlip.period }}</span>
+              </div>
+              <div class="table-cell salary-cell">
+                <span class="salary-amount gross">{{ formatCurrency(paySlip.grossSalary) }}</span>
+              </div>
+              <div class="table-cell salary-cell">
+                <span class="salary-amount net">{{ formatCurrency(paySlip.netSalary) }}</span>
+              </div>
+              <div class="table-cell status-cell">
+                <span class="status-badge" [attr.data-status]="paySlip.status">
+                  {{ getStatusLabel(paySlip.status) }}
+                </span>
+              </div>
+              <div class="table-cell actions-cell">
+                <div class="table-actions">
+                  <button class="action-btn view" (click)="onViewPaySlip(paySlip)" title="Voir détails">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  @if (paySlip.status === 'draft') {
+                    <button class="action-btn generate" (click)="onGeneratePaySlip(paySlip)" title="Générer">
+                      <i class="fas fa-file-plus"></i>
+                    </button>
+                  }
+                  @if (paySlip.status === 'generated') {
+                    <button class="action-btn send" (click)="onSendPaySlip(paySlip)" title="Envoyer">
+                      <i class="fas fa-paper-plane"></i>
+                    </button>
+                  }
+                  <button class="action-btn download" (click)="onDownloadPaySlip(paySlip)" title="Télécharger PDF">
+                    <i class="fas fa-download"></i>
+                  </button>
+                  <button class="action-btn edit" (click)="onEditPaySlip(paySlip)" title="Modifier">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  @if (paySlip.status !== 'acknowledged') {
+                    <button class="action-btn delete" (click)="onDeletePaySlip(paySlip)" title="Supprimer">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Pagination (if needed) -->
+        @if (filteredPaySlips().length > 50) {
+          <div class="pagination">
+            <span class="pagination-info">
+              Affichage de {{ filteredPaySlips().length }} bulletins
+            </span>
+          </div>
+        }
+      }
+    }
+  </div>
+</div>

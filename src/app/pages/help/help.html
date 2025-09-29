@@ -1,0 +1,76 @@
+<div class="max-w-4xl mx-auto space-y-8">
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <h1 class="text-3xl font-bold text-foreground mb-4">Centre d'aide</h1>
+    <p class="text-muted-foreground text-lg">Trouvez les réponses à vos questions et apprenez à utiliser Kora</p>
+  </div>
+
+  <!-- Barre de recherche -->
+  <div class="relative max-w-2xl mx-auto mb-8">
+    <div class="relative">
+      <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
+      <input
+        type="text"
+        placeholder="Rechercher dans l'aide..."
+        class="w-full pl-12 pr-4 py-3 bg-card border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+      />
+    </div>
+  </div>
+
+  <!-- Sections d'aide -->
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    @for (section of sections; track section.id) {
+      <div class="bg-card border rounded-lg p-6 hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+            <i [class]="section.icon" class="text-primary"></i>
+          </div>
+          <h2 class="text-xl font-semibold text-foreground">{{ section.title }}</h2>
+        </div>
+        <div class="space-y-3">
+          @for (item of section.items; track item.title) {
+            <div class="border-l-2 border-muted pl-4">
+              <h3 class="font-medium text-foreground hover:text-primary cursor-pointer transition-colors">
+                {{ item.title }}
+              </h3>
+              <p class="text-sm text-muted-foreground mt-1">{{ item.description }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- FAQ -->
+  <div class="bg-card border rounded-lg p-6">
+    <h2 class="text-2xl font-bold text-foreground mb-6">Questions fréquemment posées</h2>
+    <div class="space-y-4">
+      @for (faq of faqs; track faq.question) {
+        <div class="border-b border-border last:border-b-0 pb-4 last:pb-0">
+          <h3 class="font-semibold text-foreground mb-2 flex items-center gap-2">
+            <i class="fas fa-question-circle text-primary text-sm"></i>
+            {{ faq.question }}
+          </h3>
+          <p class="text-muted-foreground pl-6">{{ faq.answer }}</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Contact support -->
+  <div class="bg-primary/5 border border-primary/20 rounded-lg p-6 text-center">
+    <i class="fas fa-headset text-primary text-2xl mb-4"></i>
+    <h2 class="text-xl font-semibold text-foreground mb-2">Besoin d'aide supplémentaire ?</h2>
+    <p class="text-muted-foreground mb-4">Notre équipe de support est là pour vous aider</p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <button class="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+        <i class="fas fa-envelope mr-2"></i>
+        Contacter le support
+      </button>
+      <button class="bg-card border text-foreground px-6 py-2 rounded-lg hover:bg-accent transition-colors">
+        <i class="fas fa-comment mr-2"></i>
+        Chat en direct
+      </button>
+    </div>
+  </div>
+</div>

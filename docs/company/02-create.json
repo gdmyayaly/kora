@@ -1,0 +1,15 @@
+{
+  "address": "123 Business St",
+  "city": "Dakar",
+  "country": "Sénégal",
+  "currency": "XOF",
+  "description": "A technology company",
+  "email": "contact@acme.com",
+  "fiscal_number": "123456789",
+  "legal_form": "sarl",
+  "name": "Acme Corporation",
+  "phone": "+221-77-123-4567",
+  "postal_code": "10001",
+  "website": "https://acme.com",
+  "workspace_id": "123e4567-e89b-12d3-a456-426614174000"
+}

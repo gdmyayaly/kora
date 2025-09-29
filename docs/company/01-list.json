@@ -1,0 +1,27 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "address": "456 Updated Business St",
+      "city": "Dakar",
+      "company_id": "9e678203-888c-4222-9085-8541e6a1dc2e",
+      "country": "Sénégal",
+      "created_at": "2025-09-23T04:54:05.021294+00:00",
+      "currency": "XOF",
+      "description": "An updated technology company",
+      "email": "updated@acme.com",
+      "fiscal_number": "123456789",
+      "legal_form": "sarl",
+      "name": "Acasdasfafasdpdated",
+      "phone": "+221-77-123-4568",
+      "postal_code": "10002",
+      "role": "Owner",
+      "updated_at": "2025-09-23T05:09:25.544247+00:00",
+      "website": "https://updated.acme.com",
+      "workspace_id": "56adbc06-a7f8-459a-a1ac-de6c85c88c7f"
+    }
+  ],
+  "error": null,
+  "message": "Companies retrieved successfully",
+  "success": true
+}

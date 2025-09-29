@@ -1,0 +1,6 @@
+{
+  "code": 401,
+  "error": "Email or password is incorrect",
+  "message": "Invalid credentials",
+  "success": false
+}

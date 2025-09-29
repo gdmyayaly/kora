@@ -1,0 +1,166 @@
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.mobile-menu-panel {
+  animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile Menu Submenu Animations */
+.mobile-submenu-container {
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-submenu-container.max-h-0 {
+  max-height: 0;
+  opacity: 0;
+}
+
+.mobile-submenu-container.max-h-96 {
+  max-height: 24rem;
+  opacity: 1;
+}
+
+/* Chevron rotation animation */
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Mobile menu improvements */
+.mobile-menu-panel {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+}
+
+.mobile-menu-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mobile-menu-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mobile-menu-panel::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+/* Touch targets pour mobile */
+@media (hover: none) and (pointer: coarse) {
+  .mobile-menu-panel button {
+    min-height: 48px;
+    padding: 0.875rem 1rem;
+  }
+
+  .mobile-submenu-container button {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* États de focus pour l'accessibilité */
+.mobile-menu-panel button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Animation de ripple au touch */
+.mobile-menu-panel button:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+.dual-header-dropdown {
+  animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transform: translateY(0);
+}
+
+/* Zone tampon invisible pour améliorer le survol */
+.dual-header-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: transparent;
+  z-index: -1;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Support du dark mode */
+.dark .dual-header-dropdown {
+  background: var(--color-card);
+  border-color: var(--color-border);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Animation pour les chevrons */
+.transition-transform {
+  transition: transform 0.2s ease;
+}
+
+/* Support pour les préférences de mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+  .dual-header-dropdown {
+    animation: none;
+  }
+
+  .transition-transform {
+    transition: none;
+  }
+}
+
+/* Amélioration générale des dropdowns */
+.dual-header-dropdown {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Zone d'amélioration du survol pour les onglets */
+nav button {
+  position: relative;
+}
+
+nav button::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: transparent;
+  z-index: 1;
+}

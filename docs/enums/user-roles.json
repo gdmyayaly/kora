@@ -1,0 +1,50 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "description": "Full access to everything in the workspace/company",
+      "hierarchy": 100,
+      "label": "Owner",
+      "value": "owner"
+    },
+    {
+      "description": "Can manage most things but cannot delete workspace/company",
+      "hierarchy": 80,
+      "label": "Admin",
+      "value": "admin"
+    },
+    {
+      "description": "Can access and manage dashboard, financial, document, and invoice modules",
+      "hierarchy": 65,
+      "label": "Financial Manager",
+      "value": "financial_manager"
+    },
+    {
+      "description": "Can access and manage dashboard and payroll only",
+      "hierarchy": 60,
+      "label": "HR Manager",
+      "value": "hr_manager"
+    },
+    {
+      "description": "Can use all modules but cannot manage settings or users",
+      "hierarchy": 50,
+      "label": "User",
+      "value": "user"
+    },
+    {
+      "description": "Can access and manage documents only",
+      "hierarchy": 45,
+      "label": "Document Manager",
+      "value": "document_manager"
+    },
+    {
+      "description": "Can only view data, cannot create or edit anything",
+      "hierarchy": 20,
+      "label": "Viewer",
+      "value": "viewer"
+    }
+  ],
+  "error": null,
+  "message": "User roles retrieved successfully",
+  "success": true
+}

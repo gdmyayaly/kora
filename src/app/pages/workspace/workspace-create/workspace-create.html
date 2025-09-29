@@ -1,0 +1,132 @@
+<div class="container mx-auto px-4 py-6 max-w-4xl">
+  <!-- En-tête -->
+  <div class="mb-8">
+    <div class="flex items-center gap-4 mb-4">
+      <button
+        (click)="onCancel()"
+        class="p-2 hover:bg-accent/50 rounded-lg shadow-sm hover:shadow-md transition-all">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div>
+        <h1 class="text-2xl font-bold text-foreground">Créer un workspace</h1>
+        <p class="text-muted-foreground">Créez un nouvel espace de travail pour organiser vos entreprises</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="workspaceForm" (ngSubmit)="onSubmit()" class="space-y-8">
+    <!-- Informations principales -->
+    <div class="bg-card rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+      <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+        <i class="fas fa-users text-primary"></i>
+        Informations du workspace
+      </h2>
+
+      <div class="grid grid-cols-1 gap-6">
+        <!-- Nom du workspace -->
+        <div>
+          <label for="name" class="block text-sm font-medium mb-2">
+            Nom du workspace <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="Nom de votre workspace"
+            [class.border-red-500]="isFieldInvalid('name')"
+            class="w-full px-3 py-2 bg-background rounded-lg shadow-sm hover:shadow-md focus:ring-2 focus:ring-primary focus:shadow-lg transition-all">
+          @if (isFieldInvalid('name')) {
+            <p class="text-red-500 text-sm mt-1">{{ getFieldError('name') }}</p>
+          }
+          <p class="text-muted-foreground text-sm mt-1">
+            Choisissez un nom descriptif pour identifier votre espace de travail
+          </p>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="description" class="block text-sm font-medium mb-2">
+            Description
+          </label>
+          <textarea
+            id="description"
+            formControlName="description"
+            placeholder="Description du workspace (optionnel)"
+            rows="3"
+            [class.border-red-500]="isFieldInvalid('description')"
+            class="w-full px-3 py-2 bg-background rounded-lg shadow-sm hover:shadow-md focus:ring-2 focus:ring-primary focus:shadow-lg transition-all resize-none"></textarea>
+          @if (isFieldInvalid('description')) {
+            <p class="text-red-500 text-sm mt-1">{{ getFieldError('description') }}</p>
+          }
+          <p class="text-muted-foreground text-sm mt-1">
+            Décrivez brièvement l'objectif de ce workspace
+          </p>
+        </div>
+
+        <!-- Workspace par défaut -->
+        <div class="flex items-start gap-3">
+          <input
+            id="is_default"
+            type="checkbox"
+            formControlName="is_default"
+            class="mt-1 rounded shadow-sm text-primary focus:ring-2 focus:ring-primary transition-all">
+          <div class="flex-1">
+            <label for="is_default" class="block text-sm font-medium">
+              Définir comme workspace par défaut
+            </label>
+            <p class="text-muted-foreground text-sm">
+              Ce workspace sera automatiquement sélectionné lors de la connexion
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations importantes -->
+    <div class="bg-blue-50 dark:bg-blue-950/50 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-start gap-3">
+        <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-0.5"></i>
+        <div>
+          <h3 class="font-medium text-blue-800 dark:text-blue-200 mb-1">À propos des workspaces</h3>
+          <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+            <li>• Un workspace vous permet d'organiser et de regrouper vos entreprises</li>
+            <li>• Vous pouvez inviter d'autres utilisateurs à collaborer dans vos workspaces</li>
+            <li>• Chaque workspace peut contenir plusieurs entreprises</li>
+            <li>• Vous êtes automatiquement propriétaire des workspaces que vous créez</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between pt-6 border-t border-accent/30">
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="px-4 py-2 bg-accent/30 hover:bg-accent/50 rounded-lg shadow-sm hover:shadow-md transition-all">
+          Annuler
+        </button>
+        <button
+          type="button"
+          (click)="onReset()"
+          class="px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-accent/30 rounded-lg transition-all">
+          Réinitialiser
+        </button>
+      </div>
+      <button
+        type="submit"
+        [disabled]="workspaceForm.invalid || isSubmitting()"
+        class="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg shadow-sm hover:shadow-md hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+        @if (isSubmitting()) {
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>Création en cours...</span>
+        } @else {
+          <i class="fas fa-plus"></i>
+          <span>Créer le workspace</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

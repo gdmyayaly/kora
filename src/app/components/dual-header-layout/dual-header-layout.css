@@ -1,0 +1,420 @@
+/* Styles pour le layout dual-header simplifié */
+
+/* Burger Menu Styles */
+.burger-icon {
+  position: relative;
+}
+
+.burger-line {
+  transform-origin: center;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.mobile-menu-panel {
+  animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile Menu Submenu Animations */
+.mobile-submenu-container {
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-submenu-container.max-h-0 {
+  max-height: 0;
+  opacity: 0;
+}
+
+.mobile-submenu-container.max-h-96 {
+  max-height: 24rem;
+  opacity: 1;
+}
+
+/* Chevron rotation animation */
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Mobile menu improvements */
+.mobile-menu-panel {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+}
+
+.mobile-menu-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mobile-menu-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mobile-menu-panel::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+/* Touch targets pour mobile */
+@media (hover: none) and (pointer: coarse) {
+  .mobile-menu-panel button {
+    min-height: 48px;
+    padding: 0.875rem 1rem;
+  }
+
+  .mobile-submenu-container button {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* États de focus pour l'accessibilité */
+.mobile-menu-panel button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Animation de ripple au touch */
+.mobile-menu-panel button:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+.dual-header-dropdown {
+  animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transform: translateY(0); /* Position normale sans décalage pour navigation sticky */
+}
+
+/* Zone tampon invisible pour améliorer le survol */
+.dual-header-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: transparent;
+  z-index: -1;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Support du dark mode */
+.dark .dual-header-dropdown {
+  background: var(--color-card);
+  border-color: var(--color-border);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Animation pour les chevrons */
+.transition-transform {
+  transition: transform 0.2s ease;
+}
+
+/* Support pour les préférences de mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+  .dual-header-dropdown {
+    animation: none;
+  }
+
+  .transition-transform {
+    transition: none;
+  }
+}
+
+/* Amélioration générale des dropdowns */
+.dual-header-dropdown {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Zone d'amélioration du survol pour les onglets */
+nav button {
+  position: relative;
+}
+
+nav button::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: transparent;
+  z-index: 1;
+}
+
+/* Responsive: Desktop vs Mobile */
+@media (min-width: 1024px) {
+  /* Desktop: FAB caché, dropdowns visibles */
+  .floating-action-container {
+    display: none !important;
+  }
+
+  .notification-dropdown,
+  .message-dropdown {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  /* Mobile: Dropdowns cachés, FAB visible */
+  .notification-dropdown,
+  .message-dropdown {
+    display: none !important;
+  }
+
+  .floating-action-container {
+    display: block !important;
+  }
+}
+
+/* Mobile et responsive complet */
+@media (max-width: 1024px) {
+  /* Optimisation pour tablettes */
+  .dual-header-dropdown {
+    min-width: 200px;
+  }
+
+  /* Ajustement des tabs pour tablette */
+  nav .space-x-1 {
+    gap: 0.25rem;
+  }
+
+  nav button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Structure principale mobile */
+  .max-w-7xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Navigation principale mobile */
+  nav {
+    padding: 0.5rem 0;
+  }
+
+  nav .flex.items-center {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  /* Tabs navigation mobile */
+  nav button {
+    white-space: nowrap;
+    min-width: fit-content;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Actions utilisateur mobile */
+  .flex.items-center.gap-4 {
+    gap: 0.75rem;
+  }
+
+
+  /* Dropdowns mobile optimisés */
+  .dual-header-dropdown {
+    position: fixed !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    width: auto !important;
+    max-width: calc(100vw - 2rem) !important;
+    z-index: 60 !important;
+    transform: translateY(0) !important; /* Pas de chevauchement sur mobile */
+  }
+
+  /* Suppression des zones tampons sur mobile pour éviter les conflits */
+  .dual-header-dropdown::before,
+  nav button::after {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Mobile très petit écran */
+  .max-w-7xl {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Header compact */
+  header {
+    padding: 0.75rem 0;
+  }
+
+  /* Navigation compacte */
+  nav {
+    padding: 0.375rem 0;
+  }
+
+  nav button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  /* Actions utilisateur compactes */
+  .flex.items-center.gap-4 {
+    gap: 0.5rem;
+  }
+
+  .p-2 {
+    padding: 0.375rem;
+  }
+
+  /* Avatar plus petit */
+  .w-8.h-8 {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  /* Masquer le texte du profil */
+  .hidden.sm\:block {
+    display: none !important;
+  }
+
+  /* Dropdowns plein écran sur mobile */
+  .dual-header-dropdown {
+    left: 0.5rem !important;
+    right: 0.5rem !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* Touch targets plus grands */
+  .dual-header-dropdown button,
+  .dual-header-dropdown a {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Mobile très petit */
+  .max-w-7xl {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  /* Header minimal */
+  header {
+    padding: 0.5rem 0;
+  }
+
+  /* Navigation minimal */
+  nav button {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* Actions minimal */
+  .flex.items-center.gap-4 {
+    gap: 0.25rem;
+  }
+
+  .p-2 {
+    padding: 0.25rem;
+  }
+
+  /* Icônes plus petites */
+  .text-lg {
+    font-size: 1rem;
+  }
+
+  /* Dropdowns adaptés */
+  .dual-header-dropdown {
+    left: 0.25rem !important;
+    right: 0.25rem !important;
+    padding: 0.5rem;
+    max-height: 80vh !important;
+  }
+}
+
+/* Mode paysage mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  /* Header plus compact en mode paysage */
+  header {
+    padding: 0.25rem 0;
+  }
+
+  nav {
+    padding: 0.25rem 0;
+  }
+
+  nav button {
+    padding: 0.375rem 0.75rem;
+  }
+
+  /* Dropdowns plus petits en mode paysage */
+  .dual-header-dropdown {
+    max-height: 60vh !important;
+  }
+}
+
+/* Amélioration du touch */
+@media (hover: none) and (pointer: coarse) {
+  /* Touch targets pour mobile */
+  nav button {
+    min-height: 44px;
+  }
+
+  .p-2 {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Feedback tactile */
+  nav button:active {
+    background-color: var(--color-accent);
+    transform: scale(0.98);
+  }
+
+  .dual-header-dropdown button:active,
+  .dual-header-dropdown a:active {
+    background-color: var(--color-accent);
+  }
+}

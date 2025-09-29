@@ -1,0 +1,250 @@
+<div class="min-h-[100dvh] bg-gradient-to-br from-primary/10 via-background to-secondary/10">
+  <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[100dvh]">
+    <!-- Left Column - Marketing Content -->
+    <div class="hidden lg:flex flex-col justify-center p-4 lg:p-6 xl:p-8">
+      <div class="max-w-lg">
+        <!-- Logo -->
+        <div class="mb-4 lg:mb-6">
+          <h1 class="text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-1 lg:mb-2">Kora</h1>
+          <p class="text-xl lg:text-2xl text-foreground font-light">Bienvenue sur Kora</p>
+          <p class="text-base lg:text-lg text-muted-foreground mt-1">La solution complète pour les fiscalistes et comptables</p>
+        </div>
+
+        <!-- Benefits List -->
+        <div class="space-y-3 lg:space-y-4">
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <i class="fas fa-robot text-primary text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-0.5">Automatisation OCR</h3>
+              <p class="text-muted-foreground text-sm">Extraction automatique des données de vos documents</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
+              <i class="fas fa-file-invoice text-secondary text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-0.5">Déclarations simplifiées</h3>
+              <p class="text-muted-foreground text-sm">Génération automatique des déclarations fiscales</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <i class="fas fa-shield-alt text-primary text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-0.5">Conformité assurée</h3>
+              <p class="text-muted-foreground text-sm">Respect automatique de la réglementation en vigueur</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
+              <i class="fas fa-lock text-secondary text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-0.5">Sécurité maximale</h3>
+              <p class="text-muted-foreground text-sm">Chiffrement end-to-end de vos données sensibles</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <i class="fas fa-chart-line text-primary text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-0.5">Tableaux de bord</h3>
+              <p class="text-muted-foreground text-sm">Visualisation claire de votre activité</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
+              <i class="fas fa-clock text-secondary text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground mb-0.5">Gain de temps</h3>
+              <p class="text-muted-foreground text-sm">Réduction de 70% du temps de traitement</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Login Form -->
+    <div class="flex flex-col justify-center p-4 sm:p-6 lg:p-8">
+      <div class="w-full max-w-md mx-auto">
+        <!-- Mobile Logo -->
+        <div class="text-center mb-6 lg:hidden">
+          <h1 class="text-3xl font-bold text-foreground mb-2">Kora</h1>
+          <p class="text-sm text-muted-foreground">La solution pour les fiscalistes et comptables</p>
+        </div>
+
+        <!-- Login Header -->
+        <div class="text-center mb-6 lg:mb-8">
+          <h2 class="text-2xl lg:text-3xl font-bold text-foreground mb-1 lg:mb-2">Connexion</h2>
+          <p class="text-sm lg:text-base text-muted-foreground">Accédez à votre espace de travail</p>
+        </div>
+
+        <!-- Token Verification Loading -->
+        @if (checkingToken()) {
+          <div class="bg-card rounded-xl shadow-lg border border-border p-6 lg:p-8">
+            <div class="text-center">
+              <div class="flex items-center justify-center mb-4">
+                <svg class="animate-spin h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-foreground mb-2">Vérification en cours...</h3>
+              <p class="text-sm text-muted-foreground">Nous vérifions votre session existante</p>
+            </div>
+          </div>
+        } @else {
+          <!-- Login Card -->
+          <div class="bg-card rounded-xl shadow-lg border border-border p-6 lg:p-8">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Success Message -->
+        @if (successMessage()) {
+          <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">{{ successMessage() }}</span>
+          </div>
+        }
+
+        <!-- Error Message -->
+        @if (errorMessage()) {
+          <div class="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <!-- Email Field -->
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-foreground mb-2">
+            Email
+          </label>
+          <div class="relative">
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              placeholder="votre@email.com"
+              [class.border-destructive]="getFieldError('email')"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+              </svg>
+            </div>
+          </div>
+          @if (getFieldError('email')) {
+            <p class="text-destructive text-sm mt-1">{{ getFieldError('email') }}</p>
+          }
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-6">
+          <label for="password" class="block text-sm font-medium text-foreground mb-2">
+            Mot de passe
+          </label>
+          <div class="relative">
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              class="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors pr-10"
+              placeholder="••••••••"
+              [class.border-destructive]="getFieldError('password')"
+            />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+            >
+              @if (showPassword()) {
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              } @else {
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (getFieldError('password')) {
+            <p class="text-destructive text-sm mt-1">{{ getFieldError('password') }}</p>
+          }
+        </div>
+
+        <!-- Login Button -->
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+        >
+          @if (loading()) {
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Connexion...
+          } @else {
+            Se connecter
+          }
+        </button>
+
+        <!-- Divider -->
+        <div class="relative my-6">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-border"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-card text-muted-foreground">ou</span>
+          </div>
+        </div>
+
+        <!-- Google Login Button -->
+        <button
+          type="button"
+          (click)="onGoogleLogin()"
+          [disabled]="loading()"
+          class="w-full bg-background border border-border text-foreground py-3 px-4 rounded-lg font-medium hover:bg-muted focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+        >
+          <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continuer avec Google
+        </button>
+      </form>
+
+      <!-- Register Link -->
+      <div class="text-center mt-6 pt-6 border-t border-border">
+        <p class="text-muted-foreground text-sm">
+          Pas encore de compte ?
+          <a routerLink="/signup" class="text-primary hover:text-primary/80 font-medium ml-1 transition-colors">
+            Créer un compte
+          </a>
+        </p>
+      </div>
+
+      </div>
+        }
+    </div>
+  </div>
+</div>

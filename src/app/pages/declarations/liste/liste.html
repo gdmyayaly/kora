@@ -1,0 +1,486 @@
+<div class="liste-container">
+  <!-- Header avec métriques -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1><i class="fas fa-list-ul"></i> Liste des Déclarations</h1>
+        <p>Gérez toutes vos déclarations fiscales et sociales</p>
+      </div>
+      <div class="actions-section">
+        <button class="btn btn-outline" (click)="onExportDeclarations()">
+          <i class="fas fa-download"></i>
+          Exporter Excel
+        </button>
+        <button class="btn btn-primary" (click)="onCreateDeclaration()">
+          <i class="fas fa-plus"></i>
+          Nouvelle déclaration
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Dashboard -->
+  <div class="kpi-dashboard">
+    <div class="kpi-grid">
+      <div class="kpi-card total" [class.animate]="showAnimations()">
+        <div class="kpi-icon">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ metrics().overview.totalDeclarations }}</div>
+          <div class="kpi-label">Total déclarations</div>
+        </div>
+      </div>
+
+      <div class="kpi-card pending" [class.animate]="showAnimations()">
+        <div class="kpi-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ metrics().overview.pendingDeclarations }}</div>
+          <div class="kpi-label">En attente</div>
+        </div>
+      </div>
+
+      <div class="kpi-card overdue" [class.animate]="showAnimations()">
+        <div class="kpi-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ metrics().overview.overdueDeclarations }}</div>
+          <div class="kpi-label">En retard</div>
+        </div>
+      </div>
+
+      <div class="kpi-card success" [class.animate]="showAnimations()">
+        <div class="kpi-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ metrics().overview.complianceRate | number:'1.0-1' }}%</div>
+          <div class="kpi-label">Taux de conformité</div>
+        </div>
+      </div>
+
+      <div class="kpi-card info" [class.animate]="showAnimations()">
+        <div class="kpi-icon">
+          <i class="fas fa-coins"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ formatCurrency(metrics().overview.totalTaxAmount) }}</div>
+          <div class="kpi-label">Montant total</div>
+        </div>
+      </div>
+
+      <div class="kpi-card warning" [class.animate]="showAnimations()">
+        <div class="kpi-icon">
+          <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ formatCurrency(metrics().overview.totalPenalties) }}</div>
+          <div class="kpi-label">Pénalités</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="filters-section">
+    <div class="search-section">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          placeholder="Rechercher une déclaration..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          class="search-input">
+      </div>
+    </div>
+
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Type</label>
+        <select class="form-control" [(ngModel)]="selectedType" (change)="onFilterChange()">
+          <option value="">Tous les types</option>
+          <option value="tva">TVA</option>
+          <option value="dsn">DSN</option>
+          <option value="das2">DAS2</option>
+          <option value="liasse_fiscale">Liasse fiscale</option>
+          <option value="cnss">CNSS</option>
+          <option value="ipres">IPRES</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Statut</label>
+        <select class="form-control" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+          <option value="">Tous les statuts</option>
+          <option value="draft">Brouillon</option>
+          <option value="in_preparation">En préparation</option>
+          <option value="ready_to_submit">Prête à soumettre</option>
+          <option value="submitted">Soumise</option>
+          <option value="under_review">En révision</option>
+          <option value="accepted">Acceptée</option>
+          <option value="overdue">En retard</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Priorité</label>
+        <select class="form-control" [(ngModel)]="selectedPriority" (change)="onFilterChange()">
+          <option value="">Toutes les priorités</option>
+          <option value="urgent">Urgente</option>
+          <option value="high">Élevée</option>
+          <option value="medium">Moyenne</option>
+          <option value="low">Faible</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Période</label>
+        <select class="form-control" [(ngModel)]="selectedPeriod" (change)="onFilterChange()">
+          <option value="">Toutes les périodes</option>
+          <option value="current_month">Ce mois</option>
+          <option value="next_month">Mois prochain</option>
+          <option value="current_quarter">Ce trimestre</option>
+          <option value="current_year">Cette année</option>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn btn-outline btn-sm" (click)="onClearFilters()">
+          <i class="fas fa-times"></i>
+          Effacer
+        </button>
+        <button class="btn btn-outline btn-sm" (click)="toggleAdvancedFilters()">
+          <i class="fas fa-filter"></i>
+          Avancé
+        </button>
+      </div>
+    </div>
+
+    @if (showAdvancedFilters()) {
+      <div class="advanced-filters">
+        <h4><i class="fas fa-sliders-h"></i> Filtres avancés</h4>
+        <div class="advanced-grid">
+          <div class="filter-group">
+            <label>Date d'échéance</label>
+            <div class="date-range">
+              <input type="date" class="form-control" [(ngModel)]="dateFrom" (change)="onFilterChange()">
+              <span>à</span>
+              <input type="date" class="form-control" [(ngModel)]="dateTo" (change)="onFilterChange()">
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label>Assigné à</label>
+            <select class="form-control" [(ngModel)]="selectedAssignee" (change)="onFilterChange()">
+              <option value="">Tous les assignés</option>
+              <option value="Comptable Principal">Comptable Principal</option>
+              <option value="Expert Comptable">Expert Comptable</option>
+              <option value="Responsable RH">Responsable RH</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Montant</label>
+            <div class="amount-range">
+              <input type="number" placeholder="Min" class="form-control" [(ngModel)]="amountMin" (change)="onFilterChange()">
+              <span>à</span>
+              <input type="number" placeholder="Max" class="form-control" [(ngModel)]="amountMax" (change)="onFilterChange()">
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Actions groupées -->
+  @if (selectedDeclarations().length > 0) {
+    <div class="bulk-actions">
+      <div class="bulk-info">
+        <span>{{ selectedDeclarations().length }} déclaration(s) sélectionnée(s)</span>
+      </div>
+      <div class="bulk-buttons">
+        <button class="btn btn-outline btn-sm" (click)="onBulkExport()">
+          <i class="fas fa-download"></i>
+          Exporter sélection
+        </button>
+        <button class="btn btn-outline btn-sm" (click)="onBulkSubmit()">
+          <i class="fas fa-paper-plane"></i>
+          Soumettre
+        </button>
+        <button class="btn btn-outline btn-sm text-red-600" (click)="onBulkDelete()">
+          <i class="fas fa-trash"></i>
+          Supprimer
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Tableau des déclarations -->
+  <div class="table-section">
+    <div class="table-header">
+      <div class="table-title">
+        <h3>Déclarations ({{ filteredDeclarations().length }})</h3>
+      </div>
+      <div class="table-controls">
+        <div class="view-toggle">
+          <button class="view-btn" [class.active]="tableView() === 'list'" (click)="setTableView('list')">
+            <i class="fas fa-list"></i>
+          </button>
+          <button class="view-btn" [class.active]="tableView() === 'cards'" (click)="setTableView('cards')">
+            <i class="fas fa-th-large"></i>
+          </button>
+        </div>
+        <div class="pagination-info">
+          {{ (currentPage() - 1) * pageSize() + 1 }} - {{ Math.min(currentPage() * pageSize(), filteredDeclarations().length) }}
+          sur {{ filteredDeclarations().length }}
+        </div>
+      </div>
+    </div>
+
+    @if (tableView() === 'list') {
+      <!-- Vue tableau -->
+      <div class="table-container">
+        @if (filteredDeclarations().length > 0) {
+          <table class="declarations-table">
+            <thead>
+              <tr>
+                <th class="checkbox-col">
+                  <input
+                    type="checkbox"
+                    [checked]="allSelected()"
+                    [indeterminate]="someSelected()"
+                    (change)="toggleAllSelection($event)">
+                </th>
+                <th class="sortable" [class.active]="sortField() === 'declarationNumber'" (click)="onSort('declarationNumber')">
+                  Numéro
+                  <i class="fas fa-sort" [class]="getSortIcon('declarationNumber')"></i>
+                </th>
+                <th class="sortable" [class.active]="sortField() === 'type'" (click)="onSort('type')">
+                  Type
+                  <i class="fas fa-sort" [class]="getSortIcon('type')"></i>
+                </th>
+                <th class="sortable" [class.active]="sortField() === 'title'" (click)="onSort('title')">
+                  Titre
+                  <i class="fas fa-sort" [class]="getSortIcon('title')"></i>
+                </th>
+                <th class="sortable" [class.active]="sortField() === 'dueDate'" (click)="onSort('dueDate')">
+                  Échéance
+                  <i class="fas fa-sort" [class]="getSortIcon('dueDate')"></i>
+                </th>
+                <th class="sortable" [class.active]="sortField() === 'status'" (click)="onSort('status')">
+                  Statut
+                  <i class="fas fa-sort" [class]="getSortIcon('status')"></i>
+                </th>
+                <th class="sortable" [class.active]="sortField() === 'priority'" (click)="onSort('priority')">
+                  Priorité
+                  <i class="fas fa-sort" [class]="getSortIcon('priority')"></i>
+                </th>
+                <th class="sortable" [class.active]="sortField() === 'totalAmount'" (click)="onSort('totalAmount')">
+                  Montant
+                  <i class="fas fa-sort" [class]="getSortIcon('totalAmount')"></i>
+                </th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (declaration of paginatedDeclarations(); track declaration.id) {
+                <tr class="declaration-row" [class.selected]="isSelected(declaration.id)" (click)="onRowClick(declaration)">
+                  <td class="checkbox-col" (click)="$event.stopPropagation()">
+                    <input
+                      type="checkbox"
+                      [checked]="isSelected(declaration.id)"
+                      (change)="toggleSelection(declaration.id)">
+                  </td>
+                  <td class="number-col">
+                    <span class="declaration-number">{{ declaration.declarationNumber }}</span>
+                  </td>
+                  <td class="type-col">
+                    <div class="type-badge" [class]="getTypeBadgeClass(declaration.type)">
+                      {{ getTypeLabel(declaration.type) }}
+                    </div>
+                  </td>
+                  <td class="title-col">
+                    <div class="declaration-title">{{ declaration.title }}</div>
+                    <div class="declaration-period">{{ declaration.period }}</div>
+                  </td>
+                  <td class="date-col">
+                    <div class="due-date" [class]="getDueDateClass(declaration.dueDate, declaration.status)">
+                      {{ formatDate(declaration.dueDate) }}
+                    </div>
+                    @if (getDaysUntilDue(declaration.dueDate) !== null) {
+                      <div class="days-remaining" [class]="getDaysRemainingClass(getDaysUntilDue(declaration.dueDate)!)">
+                        {{ getDaysUntilDue(declaration.dueDate)! > 0 ? 'Dans ' + getDaysUntilDue(declaration.dueDate) + 'j' : 'En retard de ' + Math.abs(getDaysUntilDue(declaration.dueDate)!) + 'j' }}
+                      </div>
+                    }
+                  </td>
+                  <td class="status-col">
+                    <span class="status-badge" [class]="getStatusBadgeClass(declaration.status)">
+                      {{ getStatusLabel(declaration.status) }}
+                    </span>
+                  </td>
+                  <td class="priority-col">
+                    <span class="priority-badge" [class]="getPriorityBadgeClass(declaration.priority)">
+                      {{ getPriorityLabel(declaration.priority) }}
+                    </span>
+                  </td>
+                  <td class="amount-col">
+                    @if (declaration.totalAmount) {
+                      <span class="amount">{{ formatCurrency(declaration.totalAmount) }}</span>
+                    } @else {
+                      <span class="no-amount">-</span>
+                    }
+                  </td>
+                  <td class="actions-col" (click)="$event.stopPropagation()">
+                    <div class="action-buttons">
+                      <button class="action-btn" [title]="'Voir les détails'" (click)="onViewDeclaration(declaration)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="action-btn" [title]="'Modifier'" (click)="onEditDeclaration(declaration)">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="action-btn text-red-600" [title]="'Supprimer'" (click)="onDeleteDeclaration(declaration)">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <div class="empty-state">
+            <i class="fas fa-file-alt fa-3x"></i>
+            <h3>Aucune déclaration trouvée</h3>
+            <p>
+              @if (hasActiveFilters()) {
+                Aucune déclaration ne correspond à vos critères de recherche.
+              } @else {
+                Commencez par créer votre première déclaration.
+              }
+            </p>
+            <button class="btn btn-primary" (click)="onCreateDeclaration()">
+              <i class="fas fa-plus"></i>
+              Nouvelle déclaration
+            </button>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Vue cartes -->
+      <div class="cards-container">
+        @if (filteredDeclarations().length > 0) {
+          <div class="cards-grid">
+            @for (declaration of paginatedDeclarations(); track declaration.id) {
+              <div class="declaration-card" [class.selected]="isSelected(declaration.id)" (click)="onRowClick(declaration)">
+                <div class="card-header">
+                  <div class="card-type">
+                    <span class="type-badge" [class]="getTypeBadgeClass(declaration.type)">
+                      {{ getTypeLabel(declaration.type) }}
+                    </span>
+                  </div>
+                  <div class="card-checkbox" (click)="$event.stopPropagation()">
+                    <input
+                      type="checkbox"
+                      [checked]="isSelected(declaration.id)"
+                      (change)="toggleSelection(declaration.id)">
+                  </div>
+                </div>
+
+                <div class="card-content">
+                  <h4 class="card-title">{{ declaration.title }}</h4>
+                  <div class="card-number">{{ declaration.declarationNumber }}</div>
+                  <div class="card-period">{{ declaration.period }}</div>
+
+                  <div class="card-meta">
+                    <div class="meta-item">
+                      <i class="fas fa-calendar"></i>
+                      <span>{{ formatDate(declaration.dueDate) }}</span>
+                    </div>
+                    @if (declaration.totalAmount) {
+                      <div class="meta-item">
+                        <i class="fas fa-coins"></i>
+                        <span>{{ formatCurrency(declaration.totalAmount) }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="card-status">
+                    <span class="status-badge" [class]="getStatusBadgeClass(declaration.status)">
+                      {{ getStatusLabel(declaration.status) }}
+                    </span>
+                    <span class="priority-badge" [class]="getPriorityBadgeClass(declaration.priority)">
+                      {{ getPriorityLabel(declaration.priority) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="card-actions" (click)="$event.stopPropagation()">
+                  <button class="action-btn" (click)="onViewDeclaration(declaration)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="action-btn" (click)="onEditDeclaration(declaration)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="action-btn text-red-600" (click)="onDeleteDeclaration(declaration)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <i class="fas fa-file-alt fa-3x"></i>
+            <h3>Aucune déclaration trouvée</h3>
+            <p>
+              @if (hasActiveFilters()) {
+                Aucune déclaration ne correspond à vos critères de recherche.
+              } @else {
+                Commencez par créer votre première déclaration.
+              }
+            </p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Pagination -->
+    @if (filteredDeclarations().length > pageSize()) {
+      <div class="pagination">
+        <button class="pagination-btn" [disabled]="currentPage() === 1" (click)="setPage(currentPage() - 1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+
+        @for (page of getPageNumbers(); track page) {
+          @if (page === '...') {
+            <span class="pagination-ellipsis">...</span>
+          } @else {
+            <button
+              class="pagination-btn"
+              [class.active]="currentPage() === page"
+              (click)="setPage(+page)">
+              {{ page }}
+            </button>
+          }
+        }
+
+        <button class="pagination-btn" [disabled]="currentPage() === totalPages()" (click)="setPage(currentPage() + 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <div class="page-size-selector">
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+            <option value="10">10 par page</option>
+            <option value="25">25 par page</option>
+            <option value="50">50 par page</option>
+            <option value="100">100 par page</option>
+          </select>
+        </div>
+      </div>
+    }
+  </div>
+</div>

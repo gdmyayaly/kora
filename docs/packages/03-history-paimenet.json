@@ -1,0 +1,10 @@
+{
+  "code": 200,
+  "data": {
+    "payments": [],
+    "subscriptions": []
+  },
+  "error": null,
+  "message": "Subscription history retrieved successfully",
+  "success": true
+}

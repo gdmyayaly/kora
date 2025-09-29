@@ -1,0 +1,82 @@
+/* Burger Menu Styles */
+.burger-icon {
+  position: relative;
+}
+
+.burger-line {
+  transform-origin: center;
+}
+
+/* Trial Banner Styles */
+.trial-banner {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideDownBanner 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trial-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #f59e0b, #d97706, #f59e0b);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes slideDownBanner {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-position: -200% center;
+  }
+  50% {
+    background-position: 200% center;
+  }
+}
+
+/* Responsive trial banner */
+@media (max-width: 640px) {
+  .trial-banner .text-sm {
+    font-size: 0.8125rem;
+  }
+
+  .trial-banner .max-w-7xl {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .trial-banner .flex {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .trial-banner .text-sm {
+    font-size: 0.75rem;
+    text-align: center;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .trial-banner {
+    animation: none;
+  }
+
+  .trial-banner::before {
+    animation: none;
+    background: #f59e0b;
+  }
+}

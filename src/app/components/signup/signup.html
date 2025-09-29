@@ -1,0 +1,376 @@
+<div class="min-h-screen bg-gradient-to-br from-secondary/10 via-background to-primary/10">
+  <div class="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+    <!-- Left Column - Onboarding Steps -->
+    <div class="hidden lg:flex flex-col justify-center p-6 lg:p-8 xl:p-10">
+      <div class="max-w-lg">
+        <!-- Logo -->
+        <div class="mb-6 lg:mb-8">
+          <h1 class="text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-2 lg:mb-3">Kora</h1>
+          <p class="text-xl lg:text-2xl text-foreground font-light">Rejoignez Kora</p>
+          <p class="text-base lg:text-lg text-muted-foreground mt-1 lg:mt-2">Commencez votre transformation digitale en 3 étapes</p>
+        </div>
+
+        <!-- Onboarding Steps -->
+        <div class="space-y-5 lg:space-y-6">
+          <div class="flex items-start space-x-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg">
+              1
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground text-lg mb-2">Créez votre compte</h3>
+              <p class="text-muted-foreground">Renseignez vos informations professionnelles pour configurer votre profil de fiscaliste ou comptable.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-secondary-foreground font-bold text-lg">
+              2
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground text-lg mb-2">Configurez votre cabinet</h3>
+              <p class="text-muted-foreground">Personnalisez Kora selon vos besoins spécifiques et les services que vous proposez à vos clients.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg">
+              3
+            </div>
+            <div>
+              <h3 class="font-semibold text-foreground text-lg mb-2">Importez vos données</h3>
+              <p class="text-muted-foreground">Migrez facilement vos dossiers existants grâce à nos outils d'import automatisés et sécurisés.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bonus -->
+        <div class="mt-6 lg:mt-8 p-4 lg:p-6 bg-card rounded-xl border border-border">
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              <i class="fas fa-sparkles text-primary text-xl lg:text-2xl"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-foreground mb-1 text-sm lg:text-base">Essai gratuit de 14 jours</h4>
+              <p class="text-muted-foreground text-xs lg:text-sm">Aucune carte bancaire requise</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Register Form -->
+    <div class="flex flex-col justify-center p-4 sm:p-6 lg:p-8 overflow-y-auto">
+      <div class="w-full max-w-md mx-auto">
+        <!-- Mobile Logo -->
+        <div class="text-center mb-4 lg:hidden">
+          <h1 class="text-2xl font-bold text-foreground mb-1">Kora</h1>
+          <p class="text-xs text-muted-foreground">La solution pour les fiscalistes et comptables</p>
+        </div>
+
+        <!-- Register Header -->
+        <div class="text-center mb-4 lg:mb-6">
+          <h2 class="text-xl lg:text-2xl font-bold text-foreground mb-1">Inscription</h2>
+          <p class="text-xs lg:text-sm text-muted-foreground">Créez votre compte en quelques minutes</p>
+        </div>
+
+        <!-- Email Verification Success Screen -->
+        @if (showEmailVerification()) {
+          <div class="bg-card rounded-xl shadow-lg border border-border p-4 lg:p-6">
+            <div class="text-center">
+              <!-- Success Icon -->
+              <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+
+              <!-- Success Message -->
+              <h3 class="text-xl lg:text-2xl font-bold text-foreground mb-2">
+                Vérifiez votre email
+              </h3>
+              <p class="text-muted-foreground mb-6">
+                Nous avons envoyé un lien de vérification à<br>
+                <span class="font-medium text-foreground">{{ userEmail() }}</span>
+              </p>
+
+              <!-- Instructions -->
+              <div class="bg-muted/50 rounded-lg p-4 mb-6 text-left">
+                <h4 class="font-semibold text-foreground mb-2">Étapes suivantes :</h4>
+                <ol class="space-y-1 text-sm text-muted-foreground">
+                  <li>1. Consultez votre boîte de réception</li>
+                  <li>2. Cliquez sur le lien de vérification</li>
+                  <li>3. Connectez-vous avec vos identifiants</li>
+                </ol>
+              </div>
+
+              <!-- Resend Email Button -->
+              <button
+                type="button"
+                (click)="onResendVerification()"
+                [disabled]="resendingEmail()"
+                class="w-full bg-muted text-foreground py-3 px-4 rounded-lg font-medium hover:bg-muted/80 focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center mb-4"
+              >
+                @if (resendingEmail()) {
+                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Envoi en cours...
+                } @else {
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  Renvoyer l'email
+                }
+              </button>
+
+              <!-- Back to Login -->
+              <button
+                type="button"
+                (click)="onGoToSignin()"
+                class="text-primary hover:text-primary/80 font-medium transition-colors"
+              >
+                Retour à la connexion
+              </button>
+            </div>
+          </div>
+        } @else {
+          <!-- Register Card -->
+        <div class="bg-card rounded-xl shadow-lg border border-border p-4 lg:p-6">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <!-- Error Message -->
+        @if (errorMessage()) {
+          <div class="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <!-- First Name Field -->
+        <div class="mb-4">
+          <label for="firstName" class="block text-sm font-medium text-foreground mb-2">
+            Prénom
+          </label>
+          <div class="relative">
+            <input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              class="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              placeholder="Votre prénom"
+              [class.border-destructive]="getFieldError('firstName')"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+            </div>
+          </div>
+          @if (getFieldError('firstName')) {
+            <p class="text-destructive text-sm mt-1">{{ getFieldError('firstName') }}</p>
+          }
+        </div>
+
+        <!-- Last Name Field -->
+        <div class="mb-4">
+          <label for="lastName" class="block text-sm font-medium text-foreground mb-2">
+            Nom
+          </label>
+          <div class="relative">
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              class="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              placeholder="Votre nom"
+              [class.border-destructive]="getFieldError('lastName')"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+            </div>
+          </div>
+          @if (getFieldError('lastName')) {
+            <p class="text-destructive text-sm mt-1">{{ getFieldError('lastName') }}</p>
+          }
+        </div>
+
+        <!-- Email Field -->
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-foreground mb-2">
+            Email
+          </label>
+          <div class="relative">
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              placeholder="votre@email.com"
+              [class.border-destructive]="getFieldError('email')"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+              </svg>
+            </div>
+          </div>
+          @if (getFieldError('email')) {
+            <p class="text-destructive text-sm mt-1">{{ getFieldError('email') }}</p>
+          }
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-4">
+          <label for="password" class="block text-sm font-medium text-foreground mb-2">
+            Mot de passe
+          </label>
+          <div class="relative">
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              class="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors pr-10"
+              placeholder="••••••••"
+              [class.border-destructive]="getFieldError('password')"
+            />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+            >
+              @if (showPassword()) {
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              } @else {
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (getFieldError('password')) {
+            <p class="text-destructive text-sm mt-1">{{ getFieldError('password') }}</p>
+          }
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="mb-4">
+          <label for="confirmPassword" class="block text-sm font-medium text-foreground mb-2">
+            Confirmer le mot de passe
+          </label>
+          <div class="relative">
+            <input
+              id="confirmPassword"
+              [type]="showConfirmPassword() ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              class="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors pr-10"
+              placeholder="••••••••"
+              [class.border-destructive]="getFieldError('confirmPassword')"
+            />
+            <button
+              type="button"
+              (click)="toggleConfirmPasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+            >
+              @if (showConfirmPassword()) {
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              } @else {
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (getFieldError('confirmPassword')) {
+            <p class="text-destructive text-sm mt-1">{{ getFieldError('confirmPassword') }}</p>
+          }
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="mb-6">
+          <label class="flex items-start space-x-3 cursor-pointer">
+            <input
+              type="checkbox"
+              formControlName="acceptTerms"
+              class="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2 mt-0.5"
+              [class.border-destructive]="getFieldError('acceptTerms')"
+            />
+            <span class="text-sm text-foreground leading-5">
+              J'accepte les 
+              <a href="#" class="text-primary hover:text-primary/80 underline">conditions d'utilisation</a>
+              et la 
+              <a href="#" class="text-primary hover:text-primary/80 underline">politique de confidentialité</a>
+            </span>
+          </label>
+          @if (getFieldError('acceptTerms')) {
+            <p class="text-destructive text-sm mt-1">{{ getFieldError('acceptTerms') }}</p>
+          }
+        </div>
+
+        <!-- Register Button -->
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+        >
+          @if (loading()) {
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Inscription...
+          } @else {
+            Créer mon compte
+          }
+        </button>
+
+        <!-- Divider -->
+        <div class="relative my-6">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-border"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-card text-muted-foreground">ou</span>
+          </div>
+        </div>
+
+        <!-- Google Register Button -->
+        <button
+          type="button"
+          (click)="onGoogleRegister()"
+          [disabled]="loading()"
+          class="w-full bg-background border border-border text-foreground py-3 px-4 rounded-lg font-medium hover:bg-muted focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+        >
+          <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          S'inscrire avec Google
+        </button>
+      </form>
+
+      <!-- Login Link -->
+      <div class="text-center mt-6 pt-6 border-t border-border">
+        <p class="text-muted-foreground text-sm">
+          Déjà un compte ?
+          <a routerLink="/signin" class="text-primary hover:text-primary/80 font-medium ml-1 transition-colors">
+            Se connecter
+          </a>
+        </p>
+        </div>
+      </div>
+        }
+    </div>
+  </div>
+</div>

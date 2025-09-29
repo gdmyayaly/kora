@@ -1,0 +1,142 @@
+<!-- Deuxième Header : Navigation par Tabs (Desktop seulement) -->
+<nav class="sticky top-16 z-40 bg-card border-b hidden lg:block">
+  <div class="max-w-7xl mx-auto px-4" #tabsContainer>
+    <div class="flex items-center space-x-1">
+      @for (tab of tabs(); track tab.id) {
+        <div class="relative flex-shrink-0">
+          @if (tab.subMenus && tab.subMenus.length > 0) {
+            <!-- Onglet avec sous-menus - pas de navigation directe -->
+            <div
+              (click)="onTabClick(tab.id, $event)"
+              (mouseenter)="onTabHover(tab.id, $event)"
+              (mouseleave)="onTabLeave()"
+              class="flex items-center gap-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base hover:text-primary hover:border-primary/50 cursor-pointer"
+              [class.border-primary]="isTabActive(tab.id)"
+              [class.text-primary]="isTabActive(tab.id)"
+              [class.border-transparent]="!isTabActive(tab.id)">
+              <i [class]="tab.icon" class="text-sm"></i>
+              <span class="font-medium hidden sm:inline">{{ tab.title }}</span>
+              <span class="font-medium sm:hidden">{{ tab.title.substring(0, 3) }}</span>
+              <i class="fas fa-chevron-down text-xs transition-transform"
+                 [class.rotate-180]="shouldShowDropdown(tab.id)"></i>
+            </div>
+          } @else {
+            <!-- Onglet sans sous-menus - navigation directe -->
+            <a
+              [routerLink]="'/' + tab.id"
+              routerLinkActive="border-primary text-primary"
+              [routerLinkActiveOptions]="{exact: false}"
+              class="flex items-center gap-2 px-4 py-3 border-b-2 border-transparent transition-colors whitespace-nowrap text-sm sm:text-base hover:text-primary hover:border-primary/50">
+              <i [class]="tab.icon" class="text-sm"></i>
+              <span class="font-medium hidden sm:inline">{{ tab.title }}</span>
+              <span class="font-medium sm:hidden">{{ tab.title.substring(0, 3) }}</span>
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</nav>
+
+<!-- Dropdowns flottants (sortis du container pour éviter l'overflow) -->
+@for (tab of tabs(); track tab.id) {
+  @if (tab.subMenus && tab.subMenus.length > 0 && shouldShowDropdown(tab.id) && dropdownPosition()) {
+    <div class="fixed bg-card border rounded-lg shadow-lg z-[9999] dual-header-dropdown"
+         [style.left]="dropdownPosition()?.left"
+         [style.top]="dropdownPosition()?.top"
+         [style.min-width]="dropdownPosition()?.width"
+         (mouseenter)="onDropdownHover()"
+         (mouseleave)="onDropdownLeave()">
+      <div class="p-2">
+        @for (subMenu of tab.subMenus; track subMenu.id) {
+          <a
+            [routerLink]="subMenu.link"
+            routerLinkActive="bg-primary text-primary-foreground"
+            class="flex items-center gap-3 p-2 hover:bg-accent rounded text-sm transition-colors w-full text-left">
+            <i [class]="subMenu.icon" class="w-4"></i>
+            <span>{{ subMenu.name }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  }
+}
+
+<!-- Overlay Mobile Menu -->
+@if (showMobileMenu()) {
+  <div class="fixed inset-0 z-50 lg:hidden">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" (click)="onBackdropClick()"></div>
+
+    <!-- Menu Panel -->
+    <div class="mobile-menu-panel fixed top-0 left-0 w-80 max-w-[85vw] h-full bg-card border-r shadow-xl overflow-y-auto"
+         data-mobile-menu>
+      <!-- Header du menu mobile -->
+      <div class="flex items-center justify-between p-4 border-b">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 flex items-center justify-center">
+            <img
+              src="/logo/kora_dark.svg"
+              alt="Kora Logo"
+              class="w-8 h-8 object-contain transition-opacity duration-300"
+            />
+          </div>
+          <h2 class="font-bold text-lg">Navigation</h2>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs Mobile -->
+      <div class="p-4">
+        <div class="space-y-2">
+          @for (tab of tabs(); track tab.id) {
+            <div class="space-y-1">
+              <!-- Tab principal -->
+              @if (tab.subMenus && tab.subMenus.length > 0) {
+                <button
+                  (click)="onMobileTabClickHandler(tab.id)"
+                  class="flex items-center gap-3 w-full p-3 rounded-lg transition-all duration-200 hover:bg-accent"
+                  [class.bg-accent]="expandedMobileTab() === tab.id">
+                  <i [class]="tab.icon" class="text-lg transition-colors"></i>
+                  <span class="font-medium flex-1 text-left">{{ tab.title }}</span>
+                  <i class="fas fa-chevron-down text-xs ml-auto transition-transform duration-200"
+                     [class.rotate-180]="expandedMobileTab() === tab.id"></i>
+                </button>
+              } @else {
+                <a
+                  [routerLink]="'/' + tab.id"
+                  routerLinkActive="bg-primary text-primary-foreground"
+                  class="flex items-center gap-3 w-full p-3 rounded-lg transition-all duration-200 hover:bg-accent">
+                  <i [class]="tab.icon" class="text-lg transition-colors"></i>
+                  <span class="font-medium flex-1 text-left">{{ tab.title }}</span>
+                </a>
+              }
+
+              <!-- Sous-menus (avec animation) -->
+              @if (tab.subMenus && tab.subMenus.length > 0) {
+                <div class="mobile-submenu-container overflow-hidden transition-all duration-300"
+                     [class.max-h-0]="expandedMobileTab() !== tab.id"
+                     [class.max-h-96]="expandedMobileTab() === tab.id"
+                     [class.opacity-0]="expandedMobileTab() !== tab.id"
+                     [class.opacity-100]="expandedMobileTab() === tab.id">
+                  <div class="ml-8 space-y-1 py-2">
+                    @for (subMenu of tab.subMenus; track subMenu.id) {
+                      <a
+                        [routerLink]="subMenu.link"
+                        routerLinkActive="bg-primary text-primary-foreground"
+                        (click)="onMobileSubMenuClickHandler()"
+                        class="flex items-center gap-2 w-full p-2 text-sm rounded transition-colors hover:bg-accent/50">
+                        <i [class]="subMenu.icon" class="text-sm w-4"></i>
+                        <span class="flex-1 text-left">{{ subMenu.name }}</span>
+                      </a>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+

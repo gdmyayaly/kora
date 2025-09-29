@@ -1,0 +1,432 @@
+/* Register Component Styles */
+
+/* Grid Layout */
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Utilities */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .lg\:flex {
+    display: flex;
+  }
+  
+  .lg\:hidden {
+    display: none;
+  }
+  
+  .lg\:p-12 {
+    padding: 3rem;
+  }
+}
+
+/* Flexbox utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+/* Spacing */
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.p-8 {
+  padding: 2rem;
+}
+
+.p-10 {
+  padding: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .sm\:p-6 {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:p-6 {
+    padding: 1.5rem;
+  }
+  
+  .lg\:p-8 {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:p-10 {
+    padding: 2.5rem;
+  }
+}
+
+.space-x-3 > * + * {
+  margin-left: 0.75rem;
+}
+
+.space-x-4 > * + * {
+  margin-left: 1rem;
+}
+
+.space-y-5 > * + * {
+  margin-top: 1.25rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .lg\:space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.mb-12 {
+  margin-bottom: 3rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-6 {
+  margin-top: 1.5rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.mt-12 {
+  margin-top: 3rem;
+}
+
+@media (min-width: 1024px) {
+  .lg\:mb-3 {
+    margin-bottom: 0.75rem;
+  }
+  
+  .lg\:mb-6 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .lg\:mb-8 {
+    margin-bottom: 2rem;
+  }
+  
+  .lg\:mt-2 {
+    margin-top: 0.5rem;
+  }
+  
+  .lg\:mt-8 {
+    margin-top: 2rem;
+  }
+}
+
+/* Sizing */
+.w-12 {
+  width: 3rem;
+}
+
+.h-12 {
+  height: 3rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.max-w-md {
+  max-width: 28rem;
+}
+
+.max-w-lg {
+  max-width: 32rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+/* Text styles */
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+}
+
+.text-5xl {
+  font-size: 3rem;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+/* Colors */
+.text-foreground {
+  color: var(--color-foreground);
+}
+
+.text-muted-foreground {
+  color: var(--color-muted-foreground);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-primary-foreground {
+  color: var(--color-primary-foreground);
+}
+
+.text-secondary {
+  color: var(--color-secondary);
+}
+
+.text-secondary-foreground {
+  color: var(--color-secondary-foreground);
+}
+
+/* Backgrounds */
+.bg-gradient-to-br {
+  background: linear-gradient(to bottom right, 
+    color-mix(in srgb, var(--color-secondary) 10%, transparent),
+    var(--color-background),
+    color-mix(in srgb, var(--color-primary) 10%, transparent)
+  );
+}
+
+.bg-card {
+  background-color: var(--color-card);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+/* Border */
+.border {
+  border: 1px solid;
+}
+
+.border-border {
+  border-color: var(--color-border);
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.rounded-full {
+  border-radius: 50%;
+}
+
+/* Shadow */
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Apply animations */
+@media (min-width: 1024px) {
+  .grid > div:first-child {
+    animation: fadeInRight 0.8s ease-out;
+  }
+  
+  .grid > div:last-child {
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+  }
+}
+
+/* Steps items staggered animation */
+@media (min-width: 1024px) {
+  .space-y-8 > div:nth-child(1) {
+    animation: fadeInRight 0.6s ease-out 0.3s both;
+  }
+  
+  .space-y-8 > div:nth-child(2) {
+    animation: fadeInRight 0.6s ease-out 0.5s both;
+  }
+  
+  .space-y-8 > div:nth-child(3) {
+    animation: fadeInRight 0.6s ease-out 0.7s both;
+  }
+}
+
+/* Bonus card animation */
+@media (min-width: 1024px) {
+  .mt-12.p-6 {
+    animation: scaleIn 0.6s ease-out 0.9s both;
+  }
+}
+
+/* Step number circles hover effect */
+.bg-primary.rounded-full,
+.bg-secondary.rounded-full {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bg-primary.rounded-full:hover,
+.bg-secondary.rounded-full:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.bg-secondary.rounded-full:hover {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-secondary) 30%, transparent);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1023px) {
+  .grid-cols-1 {
+    grid-template-rows: auto 1fr;
+  }
+}

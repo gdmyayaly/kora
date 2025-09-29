@@ -1,0 +1,254 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Paies Mensuelles</h1>
+      <p>Gérez les périodes de paie et le traitement des salaires</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="onRefresh()">
+        <i class="fas fa-sync-alt"></i>
+        Actualiser
+      </button>
+      <button class="btn btn-secondary" (click)="onExportExcel()">
+        <i class="fas fa-file-excel"></i>
+        Export Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Current Period Card -->
+  <div class="current-period-card">
+    <div class="period-header">
+      <div class="period-info">
+        <h3>Période Actuelle</h3>
+        <p>{{ getCurrentPeriodName() }}</p>
+      </div>
+      <div class="period-status">
+        <span class="status-badge" [attr.data-status]="getCurrentPeriod()?.status || 'draft'">
+          {{ getStatusLabel(getCurrentPeriod()?.status || 'draft') }}
+        </span>
+      </div>
+    </div>
+
+    @if (getCurrentPeriod(); as currentPeriod) {
+      <div class="period-metrics">
+        <div class="metric-item">
+          <i class="fas fa-users"></i>
+          <div>
+            <span class="metric-value">{{ currentPeriod.employeeCount }}</span>
+            <span class="metric-label">Employés</span>
+          </div>
+        </div>
+        <div class="metric-item">
+          <i class="fas fa-euro-sign"></i>
+          <div>
+            <span class="metric-value">{{ formatCurrency(currentPeriod.totalGrossSalary) }}</span>
+            <span class="metric-label">Salaire brut total</span>
+          </div>
+        </div>
+        <div class="metric-item">
+          <i class="fas fa-wallet"></i>
+          <div>
+            <span class="metric-value">{{ formatCurrency(currentPeriod.totalNetSalary) }}</span>
+            <span class="metric-label">Salaire net total</span>
+          </div>
+        </div>
+        <div class="metric-item">
+          <i class="fas fa-calendar-check"></i>
+          <div>
+            <span class="metric-value">{{ currentPeriod.payDate | date: 'dd/MM/yyyy' }}</span>
+            <span class="metric-label">Date de paie</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="period-actions">
+        @if (currentPeriod.status === 'draft') {
+          <button class="btn btn-primary" (click)="onCalculatePayroll(currentPeriod)">
+            <i class="fas fa-calculator"></i>
+            Calculer les paies
+          </button>
+        }
+        @if (currentPeriod.status === 'calculated') {
+          <button class="btn btn-success" (click)="onValidatePayroll(currentPeriod)">
+            <i class="fas fa-check"></i>
+            Valider les paies
+          </button>
+        }
+        @if (currentPeriod.status === 'validated') {
+          <button class="btn btn-warning" (click)="onProcessPayroll(currentPeriod)">
+            <i class="fas fa-money-bill-transfer"></i>
+            Traiter les paiements
+          </button>
+        }
+        <button class="btn btn-secondary" (click)="onViewPaySlips(currentPeriod)">
+          <i class="fas fa-file-alt"></i>
+          Voir bulletins
+        </button>
+      </div>
+    } @else {
+      <div class="no-current-period">
+        <i class="fas fa-calendar-plus fa-2x"></i>
+        <h4>Aucune période active</h4>
+        <p>Créez une nouvelle période de paie pour commencer</p>
+        <button class="btn btn-primary" (click)="onCreatePeriod()">
+          <i class="fas fa-plus"></i>
+          Créer période de paie
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-section">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Rechercher une période..."
+            [value]="searchTerm()"
+            (input)="onSearchChange($event)"
+          >
+        </div>
+      </div>
+
+      <div class="filters-section">
+        <select [value]="selectedYear()" (change)="onYearFilterChange($event)">
+          <option value="all">Toutes les années</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+        </select>
+
+        <select [value]="selectedStatus()" (change)="onStatusFilterChange($event)">
+          <option value="all">Tous les statuts</option>
+          <option value="draft">Brouillon</option>
+          <option value="calculated">Calculé</option>
+          <option value="validated">Validé</option>
+          <option value="paid">Payé</option>
+          <option value="closed">Clôturé</option>
+        </select>
+      </div>
+
+      <div class="action-section">
+        <button class="btn btn-primary" (click)="onCreatePeriod()">
+          <i class="fas fa-plus"></i>
+          Nouvelle période
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Chargement des périodes de paie...</p>
+      </div>
+    }
+
+    <!-- Content -->
+    @if (!isLoading()) {
+      @if (filteredPeriods().length === 0) {
+        <div class="empty-state">
+          <i class="fas fa-calendar-alt fa-3x"></i>
+          <h3>Aucune période trouvée</h3>
+          <p>Aucune période de paie ne correspond à vos critères</p>
+          <button class="btn btn-primary" (click)="onCreatePeriod()">
+            <i class="fas fa-plus"></i>
+            Créer première période
+          </button>
+        </div>
+      } @else {
+        <div class="periods-grid">
+          @for (period of filteredPeriods(); track period.id) {
+            <div class="period-card" [class.current]="isCurrentPeriod(period)">
+              <div class="card-header">
+                <div class="period-date">
+                  <h4>{{ getPeriodName(period) }}</h4>
+                  <p>{{ period.startDate | date: 'dd/MM/yyyy' }} - {{ period.endDate | date: 'dd/MM/yyyy' }}</p>
+                </div>
+                <span class="status-badge" [attr.data-status]="period.status">
+                  {{ getStatusLabel(period.status) }}
+                </span>
+              </div>
+
+              <div class="card-metrics">
+                <div class="metric-row">
+                  <div class="metric-small">
+                    <i class="fas fa-users"></i>
+                    <span>{{ period.employeeCount }} employés</span>
+                  </div>
+                  <div class="metric-small">
+                    <i class="fas fa-calendar"></i>
+                    <span>{{ period.payDate | date: 'dd/MM' }}</span>
+                  </div>
+                </div>
+
+                <div class="financial-metrics">
+                  <div class="financial-item">
+                    <span class="label">Salaire brut:</span>
+                    <span class="value gross">{{ formatCurrency(period.totalGrossSalary) }}</span>
+                  </div>
+                  <div class="financial-item">
+                    <span class="label">Charges sociales:</span>
+                    <span class="value charges">{{ formatCurrency(period.totalContributions) }}</span>
+                  </div>
+                  <div class="financial-item">
+                    <span class="label">Impôts:</span>
+                    <span class="value taxes">{{ formatCurrency(period.totalTaxes) }}</span>
+                  </div>
+                  <div class="financial-item total">
+                    <span class="label">Salaire net:</span>
+                    <span class="value net">{{ formatCurrency(period.totalNetSalary) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-actions">
+                <button class="action-btn view" (click)="onViewPeriod(period)" title="Voir détails">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn edit" (click)="onEditPeriod(period)" title="Modifier">
+                  <i class="fas fa-edit"></i>
+                </button>
+                @if (period.status === 'draft') {
+                  <button class="action-btn calculate" (click)="onCalculatePayroll(period)" title="Calculer">
+                    <i class="fas fa-calculator"></i>
+                  </button>
+                }
+                @if (period.status === 'calculated') {
+                  <button class="action-btn validate" (click)="onValidatePayroll(period)" title="Valider">
+                    <i class="fas fa-check"></i>
+                  </button>
+                }
+                @if (period.status === 'validated') {
+                  <button class="action-btn process" (click)="onProcessPayroll(period)" title="Traiter">
+                    <i class="fas fa-money-bill-transfer"></i>
+                  </button>
+                }
+                <button class="action-btn bulletins" (click)="onViewPaySlips(period)" title="Bulletins">
+                  <i class="fas fa-file-alt"></i>
+                </button>
+                @if (period.status !== 'closed') {
+                  <button class="action-btn delete" (click)="onDeletePeriod(period)" title="Supprimer">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                }
+              </div>
+
+              @if (isCurrentPeriod(period)) {
+                <div class="current-badge">
+                  <i class="fas fa-star"></i>
+                  Période actuelle
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>

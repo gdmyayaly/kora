@@ -1,0 +1,389 @@
+<div class="min-h-screen bg-background">
+  <!-- Header -->
+  <div class="bg-card border-b">
+    <div class="container mx-auto px-4 py-6">
+      <div class="text-center">
+        <h1 class="text-3xl font-bold text-foreground mb-2">Choisir votre plan</h1>
+        <p class="text-muted-foreground">
+          Choisissez l'abonnement qui correspond le mieux à vos besoins
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="container mx-auto px-4 py-12">
+      <div class="flex items-center justify-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span class="ml-3 text-muted-foreground">Chargement...</span>
+      </div>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !loading()) {
+    <div class="container mx-auto px-4 py-12">
+      <div class="bg-destructive/10 border border-destructive/20 rounded-lg p-6 text-center">
+        <i class="fas fa-exclamation-triangle text-destructive text-2xl mb-4"></i>
+        <h3 class="text-lg font-semibold text-destructive mb-2">Erreur de chargement</h3>
+        <p class="text-destructive/80">{{ error() }}</p>
+        <button
+          (click)="loadData()"
+          class="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          Réessayer
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Main Content -->
+  @if (!loading() && !error()) {
+    <div class="container mx-auto px-4 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Package Selection (2/3) -->
+        <div class="lg:col-span-2">
+          @if (!showPaymentForm()) {
+            <!-- Billing Cycle Toggle -->
+            <div class="mb-8">
+              <div class="flex items-center justify-center">
+                <div class="bg-muted rounded-lg p-1 flex">
+                  <button
+                    (click)="onBillingCycleChange('monthly')"
+                    class="px-4 py-2 rounded-md text-sm font-medium transition-all"
+                    [class.bg-background]="billingCycle() === 'monthly'"
+                    [class.shadow-sm]="billingCycle() === 'monthly'"
+                    [class.text-foreground]="billingCycle() === 'monthly'"
+                    [class.text-muted-foreground]="billingCycle() !== 'monthly'"
+                  >
+                    Mensuel
+                  </button>
+                  <button
+                    (click)="onBillingCycleChange('annual')"
+                    class="px-4 py-2 rounded-md text-sm font-medium transition-all relative"
+                    [class.bg-background]="billingCycle() === 'annual'"
+                    [class.shadow-sm]="billingCycle() === 'annual'"
+                    [class.text-foreground]="billingCycle() === 'annual'"
+                    [class.text-muted-foreground]="billingCycle() !== 'annual'"
+                  >
+                    Annuel
+                    <span class="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+                      -20%
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Packages Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              @for (package of subscriptionPackages(); track package.package_id) {
+                <div
+                  class="relative bg-card rounded-xl border transition-all duration-300 hover:shadow-lg"
+                  [class.ring-2]="isCurrentPackage(package)"
+                  [class.ring-primary]="isCurrentPackage(package)"
+                  [class.shadow-lg]="isPopularPackage(package)"
+                >
+                  <!-- Popular Badge -->
+                  @if (isPopularPackage(package)) {
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <span class="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">
+                        Populaire
+                      </span>
+                    </div>
+                  }
+
+                  <!-- Current Package Badge -->
+                  @if (isCurrentPackage(package)) {
+                    <div class="absolute -top-3 right-4">
+                      <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        Actuel
+                      </span>
+                    </div>
+                  }
+
+                  <div class="p-6">
+                    <!-- Package Header -->
+                    <div class="text-center mb-6">
+                      <h3 class="text-xl font-bold text-foreground mb-2">{{ package.name }}</h3>
+                      <p class="text-muted-foreground text-sm mb-4">{{ package.description }}</p>
+
+                      <div class="mb-4">
+                        <div class="text-3xl font-bold text-foreground">
+                          {{ formatPrice(getPackageDisplayPrice(package)) }}
+                        </div>
+                        @if (billingCycle() === 'annual') {
+                          <div class="text-sm text-muted-foreground">
+                            {{ formatPrice(package.price) }}/mois facturé annuellement
+                          </div>
+                        } @else {
+                          <div class="text-sm text-muted-foreground">par mois</div>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Features List -->
+                    <ul class="space-y-3 mb-6">
+                      @for (feature of package.features; track $index) {
+                        <li class="flex items-center text-sm">
+                          <i class="fas fa-check text-green-500 mr-3 flex-shrink-0"></i>
+                          <span>{{ feature }}</span>
+                        </li>
+                      }
+                    </ul>
+
+                    <!-- Limits -->
+                    <div class="text-xs text-muted-foreground mb-6 space-y-1">
+                      <div>Entreprises : {{ package.max_companies === -1 ? 'Illimitées' : package.max_companies }}</div>
+                      <div>Utilisateurs : {{ package.max_users === -1 ? 'Illimités' : package.max_users }}</div>
+                      <div>Workspaces : {{ package.max_workspaces === -1 ? 'Illimités' : package.max_workspaces }}</div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button
+                      (click)="onPackageSelect(package)"
+                      [disabled]="isCurrentPackage(package)"
+                      class="w-full py-3 px-4 rounded-lg font-medium transition-all"
+                      [class.bg-primary]="!isCurrentPackage(package) && isPopularPackage(package)"
+                      [class.text-primary-foreground]="!isCurrentPackage(package) && isPopularPackage(package)"
+                      [class.hover:bg-primary/90]="!isCurrentPackage(package) && isPopularPackage(package)"
+                      [class.bg-accent]="!isCurrentPackage(package) && !isPopularPackage(package)"
+                      [class.text-accent-foreground]="!isCurrentPackage(package) && !isPopularPackage(package)"
+                      [class.hover:bg-accent/80]="!isCurrentPackage(package) && !isPopularPackage(package)"
+                      [class.bg-muted]="isCurrentPackage(package)"
+                      [class.text-muted-foreground]="isCurrentPackage(package)"
+                      [class.cursor-not-allowed]="isCurrentPackage(package)"
+                    >
+                      @if (isCurrentPackage(package)) {
+                        Forfait actuel
+                      } @else {
+                        Choisir ce forfait
+                      }
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <!-- Payment Form View -->
+            <div class="bg-card rounded-xl border p-6">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-foreground">Informations de paiement</h3>
+                <button
+                  (click)="onBackToPackages()"
+                  class="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <i class="fas fa-arrow-left mr-2"></i>
+                  Retour
+                </button>
+              </div>
+
+              <form [formGroup]="paymentForm" (ngSubmit)="onPaymentSubmit()">
+                <!-- Email -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-foreground mb-2">Email</label>
+                  <input
+                    type="email"
+                    formControlName="email"
+                    placeholder="votre@email.com"
+                    class="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                </div>
+
+                <!-- Card Name -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-foreground mb-2">Nom sur la carte</label>
+                  <input
+                    type="text"
+                    formControlName="cardName"
+                    placeholder="John Doe"
+                    class="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                </div>
+
+                <!-- Card Number -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-foreground mb-2">Numéro de carte</label>
+                  <input
+                    type="text"
+                    formControlName="cardNumber"
+                    placeholder="1234 5678 9012 3456"
+                    maxlength="16"
+                    class="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                </div>
+
+                <!-- Expiry and CVV -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label class="block text-sm font-medium text-foreground mb-2">Expiration</label>
+                    <input
+                      type="text"
+                      formControlName="expiryDate"
+                      placeholder="MM/YY"
+                      maxlength="5"
+                      class="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-foreground mb-2">CVV</label>
+                    <input
+                      type="text"
+                      formControlName="cvv"
+                      placeholder="123"
+                      maxlength="4"
+                      class="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                  </div>
+                </div>
+
+                <!-- Terms Acceptance -->
+                <div class="mb-6">
+                  <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      formControlName="acceptTerms"
+                      class="mr-3 h-4 w-4 text-primary focus:ring-primary border-input rounded"
+                    >
+                    <span class="text-sm text-muted-foreground">
+                      J'accepte les
+                      <a href="#" class="text-primary hover:underline">conditions d'utilisation</a>
+                      et la
+                      <a href="#" class="text-primary hover:underline">politique de confidentialité</a>
+                    </span>
+                  </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button
+                  type="submit"
+                  [disabled]="!paymentForm.valid"
+                  class="w-full py-3 px-4 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <i class="fas fa-lock mr-2"></i>
+                  Confirmer le paiement
+                </button>
+              </form>
+            </div>
+          }
+        </div>
+
+        <!-- Order Summary Sidebar (1/3) -->
+        <div class="lg:col-span-1">
+          <div class="sticky top-8">
+            @if (selectedPackage()) {
+              <div class="bg-card rounded-xl border p-6">
+                <h3 class="text-lg font-bold text-foreground mb-4">Récapitulatif</h3>
+
+                <!-- Selected Package -->
+                <div class="mb-4 p-4 bg-accent/50 rounded-lg">
+                  <div class="font-medium text-foreground">{{ selectedPackage()!.name }}</div>
+                  <div class="text-sm text-muted-foreground">{{ selectedPackage()!.description }}</div>
+                </div>
+
+                <!-- Billing Details -->
+                <div class="space-y-3 mb-6">
+                  <div class="flex justify-between">
+                    <span class="text-muted-foreground">Facturation</span>
+                    <span class="text-foreground capitalize">{{ billingCycle() === 'monthly' ? 'Mensuelle' : 'Annuelle' }}</span>
+                  </div>
+
+                  @if (billingCycle() === 'annual') {
+                    <div class="flex justify-between text-sm">
+                      <span class="text-muted-foreground">Prix mensuel</span>
+                      <span class="text-foreground">{{ formatPrice(selectedPackage()!.price) }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-muted-foreground">Prix annuel (x12)</span>
+                      <span class="text-foreground line-through">{{ formatPrice(selectedPackage()!.price * 12) }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-green-600">
+                      <span>Réduction annuelle</span>
+                      <span>-{{ formatPrice(annualDiscount()) }}</span>
+                    </div>
+                  }
+                </div>
+
+                <!-- Total -->
+                <div class="border-t pt-4">
+                  <div class="flex justify-between items-center">
+                    <span class="text-lg font-bold text-foreground">Total</span>
+                    <div class="text-right">
+                      <div class="text-xl font-bold text-foreground">{{ formatPrice(selectedPackagePrice()) }}</div>
+                      @if (billingCycle() === 'annual') {
+                        <div class="text-sm text-muted-foreground">Facturé annuellement</div>
+                      } @else {
+                        <div class="text-sm text-muted-foreground">Facturé mensuellement</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Package Features -->
+                <div class="mt-6 pt-6 border-t">
+                  <h4 class="font-medium text-foreground mb-3">Inclus dans ce forfait</h4>
+                  <ul class="space-y-2">
+                    @for (feature of selectedPackage()!.features; track $index) {
+                      <li class="flex items-center text-sm">
+                        <i class="fas fa-check text-green-500 mr-2 flex-shrink-0"></i>
+                        <span class="text-muted-foreground">{{ feature }}</span>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              </div>
+            } @else {
+              <!-- Current Package Info -->
+              @if (currentPackage()) {
+                <div class="bg-card rounded-xl border p-6">
+                  <h3 class="text-lg font-bold text-foreground mb-4">Forfait actuel</h3>
+
+                  <div class="mb-4 p-4 bg-accent/50 rounded-lg">
+                    <div class="font-medium text-foreground">{{ currentPackage()!.name }}</div>
+                    <div class="text-sm text-muted-foreground">{{ currentPackage()!.description }}</div>
+                  </div>
+
+                  @if (currentPackage()!.is_trial) {
+                    <div class="mb-4 p-4 bg-amber-50 dark:bg-amber-950/50 rounded-lg border border-amber-200 dark:border-amber-800">
+                      <div class="flex items-center mb-2">
+                        <i class="fas fa-clock text-amber-600 dark:text-amber-400 mr-2"></i>
+                        <span class="font-medium text-amber-800 dark:text-amber-200">Période d'essai</span>
+                      </div>
+                      <div class="text-sm text-amber-700 dark:text-amber-300">
+                        Expire le {{ formatExpirationDate(currentPackage()!.subscription_expires_at) }}
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Usage Limits -->
+                  <div class="space-y-3">
+                    <h4 class="font-medium text-foreground">Utilisation</h4>
+
+                    <div class="space-y-2">
+                      <div class="flex justify-between text-sm">
+                        <span class="text-muted-foreground">Entreprises</span>
+                        <span class="text-foreground">
+                          {{ currentPackage()!.usage_limits.companies.current }} /
+                          {{ currentPackage()!.usage_limits.companies.max === -1 ? '∞' : currentPackage()!.usage_limits.companies.max }}
+                        </span>
+                      </div>
+
+                      <div class="flex justify-between text-sm">
+                        <span class="text-muted-foreground">Workspaces</span>
+                        <span class="text-foreground">
+                          {{ currentPackage()!.usage_limits.workspaces.current }} /
+                          {{ currentPackage()!.usage_limits.workspaces.max === -1 ? '∞' : currentPackage()!.usage_limits.workspaces.max }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

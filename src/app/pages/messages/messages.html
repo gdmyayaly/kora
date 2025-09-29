@@ -1,0 +1,297 @@
+<div class="h-[calc(100vh-12rem)] max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-foreground">Messages</h1>
+      <p class="text-muted-foreground mt-1">Gérez vos communications et correspondances</p>
+    </div>
+    <button
+      (click)="openCompose()"
+      class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+      <i class="fas fa-pen mr-2"></i>
+      Nouveau message
+    </button>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-4 h-full">
+    <!-- Sidebar -->
+    <div class="lg:col-span-1">
+      <div class="bg-card border rounded-lg p-4 h-full flex flex-col">
+        <!-- Search -->
+        <div class="relative mb-4">
+          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
+          <input
+            type="text"
+            placeholder="Rechercher..."
+            (input)="onSearch($event)"
+            class="w-full pl-10 pr-4 py-2 bg-background border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+          />
+        </div>
+
+        <!-- Categories -->
+        <div class="space-y-2 flex-1">
+          @for (category of categories; track category.value) {
+            <button
+(click)="setCategory(category.value)"
+              class="flex items-center gap-3 w-full p-3 rounded-lg transition-colors text-left"
+              [class.bg-primary]="selectedCategory() === category.value"
+              [class.text-primary-foreground]="selectedCategory() === category.value"
+              [class.hover:bg-accent]="selectedCategory() !== category.value">
+              <i [class]="category.icon" class="text-sm w-4"></i>
+              <span class="font-medium">{{ category.label }}</span>
+              @if (category.value === 'inbox' && unreadCount() > 0) {
+                <span class="ml-auto px-2 py-0.5 bg-primary text-primary-foreground text-xs rounded-full">
+                  {{ unreadCount() }}
+                </span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages List -->
+    <div class="lg:col-span-1">
+      <div class="bg-card border rounded-lg h-full flex flex-col">
+        <div class="p-4 border-b">
+          <h2 class="font-semibold text-foreground">
+            @for (category of categories; track category.value) {
+              @if (selectedCategory() === category.value) {
+                {{ category.label }}
+              }
+            }
+            <span class="text-muted-foreground text-sm font-normal ml-2">
+              ({{ filteredMessages().length }})
+            </span>
+          </h2>
+        </div>
+
+        <div class="flex-1 overflow-y-auto">
+          @if (filteredMessages().length === 0) {
+            <div class="p-8 text-center">
+              <i class="fas fa-inbox text-3xl text-muted-foreground mb-4"></i>
+              <p class="text-muted-foreground">
+                @if (searchQuery()) {
+                  Aucun message trouvé pour "{{ searchQuery() }}"
+                } @else {
+                  Aucun message dans cette catégorie
+                }
+              </p>
+            </div>
+          } @else {
+            <div class="divide-y">
+              @for (message of filteredMessages(); track message.id) {
+                <div
+                  (click)="selectMessage(message)"
+                  class="p-4 hover:bg-accent cursor-pointer transition-colors"
+                  [class.bg-accent]="selectedMessage()?.id === message.id"
+                  [class.border-l-4]="!message.read && message.category === 'inbox'"
+                  [class.border-l-primary]="!message.read && message.category === 'inbox'">
+
+                  <div class="flex items-start gap-3">
+                    <!-- Avatar -->
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                      @if (message.sender.avatar) {
+                        <img [src]="message.sender.avatar" [alt]="message.sender.name" class="w-full h-full rounded-full object-cover">
+                      } @else {
+                        <span class="text-primary-foreground text-sm font-medium">
+                          {{ getInitials(message.sender.name) }}
+                        </span>
+                      }
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center justify-between gap-2 mb-1">
+                        <h3 class="font-medium text-foreground truncate"
+                            [class.font-bold]="!message.read">
+                          {{ message.sender.name }}
+                        </h3>
+                        <div class="flex items-center gap-1">
+                          @if (message.important) {
+                            <i class="fas fa-star text-yellow-500 text-xs"></i>
+                          }
+                          @if (message.attachments && message.attachments.length > 0) {
+                            <i class="fas fa-paperclip text-muted-foreground text-xs"></i>
+                          }
+                          <span class="text-xs text-muted-foreground">
+                            {{ formatTimestamp(message.timestamp) }}
+                          </span>
+                        </div>
+                      </div>
+                      <p class="text-sm text-muted-foreground truncate mb-1"
+                         [class.font-semibold]="!message.read">
+                        {{ message.subject }}
+                      </p>
+                      <p class="text-xs text-muted-foreground truncate">
+                        {{ message.content }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Detail -->
+    <div class="lg:col-span-2">
+      <div class="bg-card border rounded-lg h-full flex flex-col">
+        @if (!selectedMessage()) {
+          <div class="flex-1 flex items-center justify-center p-8 text-center">
+            <div>
+              <i class="fas fa-envelope-open-text text-4xl text-muted-foreground mb-4"></i>
+              <h3 class="text-lg font-semibold text-foreground mb-2">Sélectionnez un message</h3>
+              <p class="text-muted-foreground">Choisissez un message dans la liste pour le lire</p>
+            </div>
+          </div>
+        } @else {
+          <!-- Message Header -->
+          <div class="p-6 border-b">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div class="flex-1">
+                <h1 class="text-xl font-semibold text-foreground mb-2">{{ selectedMessage()!.subject }}</h1>
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                    <span class="text-primary-foreground text-sm font-medium">
+                      {{ getInitials(selectedMessage()!.sender.name) }}
+                    </span>
+                  </div>
+                  <div>
+                    <p class="font-medium text-foreground">{{ selectedMessage()!.sender.name }}</p>
+                    <p class="text-sm text-muted-foreground">{{ selectedMessage()!.sender.email }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  (click)="markAsImportant(selectedMessage()!.id)"
+                  class="p-2 rounded-lg hover:bg-accent transition-colors"
+                  [class.text-yellow-500]="selectedMessage()!.important"
+                  [class.text-muted-foreground]="!selectedMessage()!.important">
+                  <i class="fas fa-star"></i>
+                </button>
+                <button
+                  (click)="archiveMessage(selectedMessage()!.id)"
+                  class="p-2 text-muted-foreground hover:text-primary rounded-lg hover:bg-accent transition-colors">
+                  <i class="fas fa-archive"></i>
+                </button>
+                <button
+                  (click)="deleteMessage(selectedMessage()!.id)"
+                  class="p-2 text-muted-foreground hover:text-destructive rounded-lg hover:bg-accent transition-colors">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="text-sm text-muted-foreground">
+              {{ selectedMessage()!.timestamp.toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              }) }} à {{ selectedMessage()!.timestamp.toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit'
+              }) }}
+            </div>
+          </div>
+
+          <!-- Message Content -->
+          <div class="flex-1 p-6 overflow-y-auto">
+            <div class="prose max-w-none">
+              <div class="whitespace-pre-wrap text-foreground leading-relaxed">{{ selectedMessage()!.content }}</div>
+            </div>
+
+            <!-- Attachments -->
+            @if (selectedMessage()!.attachments && selectedMessage()!.attachments!.length > 0) {
+              <div class="mt-6 p-4 bg-muted/50 rounded-lg">
+                <h4 class="font-medium text-foreground mb-3">Pièces jointes</h4>
+                <div class="space-y-2">
+                  @for (attachment of selectedMessage()!.attachments; track attachment.name) {
+                    <div class="flex items-center gap-3 p-2 bg-card rounded border hover:bg-accent transition-colors">
+                      <i class="fas fa-file-pdf text-red-500"></i>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-foreground">{{ attachment.name }}</p>
+                        <p class="text-xs text-muted-foreground">{{ formatFileSize(attachment.size) }}</p>
+                      </div>
+                      <button class="p-1 text-primary hover:text-primary/80 transition-colors">
+                        <i class="fas fa-download text-sm"></i>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Reply Actions -->
+          <div class="p-6 border-t">
+            <div class="flex gap-3">
+              <button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+                <i class="fas fa-reply mr-2"></i>
+                Répondre
+              </button>
+              <button class="px-4 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-muted/80 transition-colors">
+                <i class="fas fa-reply-all mr-2"></i>
+                Répondre à tous
+              </button>
+              <button class="px-4 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-muted/80 transition-colors">
+                <i class="fas fa-share mr-2"></i>
+                Transférer
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Compose Modal -->
+  @if (showCompose()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div class="bg-card border rounded-lg w-full max-w-2xl max-h-[80vh] flex flex-col">
+        <div class="flex items-center justify-between p-6 border-b">
+          <h2 class="text-xl font-semibold text-foreground">Nouveau message</h2>
+          <button
+            (click)="closeCompose()"
+            class="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent transition-colors">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="flex-1 p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-2">Destinataire</label>
+            <input type="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" placeholder="email@exemple.com">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-2">Objet</label>
+            <input type="text" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" placeholder="Objet du message">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-2">Message</label>
+            <textarea rows="8" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none" placeholder="Tapez votre message..."></textarea>
+          </div>
+        </div>
+        <div class="flex items-center justify-between p-6 border-t">
+          <button class="text-muted-foreground hover:text-primary transition-colors">
+            <i class="fas fa-paperclip mr-2"></i>
+            Joindre un fichier
+          </button>
+          <div class="flex gap-3">
+            <button
+              (click)="closeCompose()"
+              class="px-4 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-muted/80 transition-colors">
+              Annuler
+            </button>
+            <button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+              <i class="fas fa-paper-plane mr-2"></i>
+              Envoyer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

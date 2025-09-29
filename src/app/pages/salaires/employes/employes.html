@@ -1,0 +1,294 @@
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestion des Employés</h1>
+      <p>Gérez votre équipe et leurs informations de paie</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="onRefresh()">
+        <i class="fas fa-sync-alt"></i>
+        Actualiser
+      </button>
+      <button class="btn btn-secondary" (click)="onExportExcel()">
+        <i class="fas fa-file-excel"></i>
+        Export Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Metrics Cards -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="metric-content">
+        <h3>{{ metrics().overview.totalEmployees }}</h3>
+        <p>Total employés</p>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon active">
+        <i class="fas fa-user-check"></i>
+      </div>
+      <div class="metric-content">
+        <h3>{{ metrics().overview.activeEmployees }}</h3>
+        <p>Employés actifs</p>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon new">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <div class="metric-content">
+        <h3>{{ metrics().overview.newEmployees }}</h3>
+        <p>Nouveaux (3 mois)</p>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon warning">
+        <i class="fas fa-user-clock"></i>
+      </div>
+      <div class="metric-content">
+        <h3>{{ metrics().overview.employeesOnLeave }}</h3>
+        <p>En congé</p>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon primary">
+        <i class="fas fa-euro-sign"></i>
+      </div>
+      <div class="metric-content">
+        <h3>{{ formatCurrency(metrics().overview.avgMonthlySalary) }}</h3>
+        <p>Salaire moyen</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-section">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            placeholder="Rechercher un employé..."
+            [value]="searchTerm()"
+            (input)="onSearchChange($event)"
+          >
+        </div>
+      </div>
+
+      <div class="filters-section">
+        <select [value]="selectedDepartment()" (change)="onDepartmentFilterChange($event)">
+          <option value="all">Tous les départements</option>
+          <option value="direction">Direction</option>
+          <option value="comptabilite">Comptabilité</option>
+          <option value="rh">Ressources Humaines</option>
+          <option value="commercial">Commercial</option>
+          <option value="technique">Technique</option>
+        </select>
+
+        <select [value]="selectedStatus()" (change)="onStatusFilterChange($event)">
+          <option value="all">Tous les statuts</option>
+          <option value="active">Actifs</option>
+          <option value="inactive">Inactifs</option>
+          <option value="on_leave">En congé</option>
+        </select>
+
+        <select [value]="selectedContractType()" (change)="onContractTypeFilterChange($event)">
+          <option value="all">Tous les contrats</option>
+          <option value="cdi">CDI</option>
+          <option value="cdd">CDD</option>
+          <option value="stage">Stage</option>
+        </select>
+      </div>
+
+      <div class="view-section">
+        <div class="view-toggle">
+          <button
+            class="view-btn"
+            [class.active]="viewMode() === 'grid'"
+            (click)="onViewModeChange('grid')"
+          >
+            <i class="fas fa-th"></i>
+          </button>
+          <button
+            class="view-btn"
+            [class.active]="viewMode() === 'list'"
+            (click)="onViewModeChange('list')"
+          >
+            <i class="fas fa-list"></i>
+          </button>
+        </div>
+
+        <button class="btn btn-primary" (click)="onCreateEmployee()">
+          <i class="fas fa-plus"></i>
+          Nouvel employé
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Chargement des employés...</p>
+      </div>
+    }
+
+    <!-- Content -->
+    @if (!isLoading()) {
+      @if (filteredEmployees().length === 0) {
+        <div class="empty-state">
+          <i class="fas fa-user-tie fa-3x"></i>
+          <h3>Aucun employé trouvé</h3>
+          <p>Aucun employé ne correspond à vos critères de recherche</p>
+          <button class="btn btn-primary" (click)="onCreateEmployee()">
+            <i class="fas fa-plus"></i>
+            Ajouter un employé
+          </button>
+        </div>
+      } @else {
+        <!-- Grid View -->
+        @if (viewMode() === 'grid') {
+          <div class="employees-grid">
+            @for (employee of filteredEmployees(); track employee.id) {
+              <div class="employee-card" [class.inactive]="!employee.isActive">
+                <div class="employee-header">
+                  <div class="employee-avatar">
+                    <span>{{ getEmployeeInitials(employee) }}</span>
+                  </div>
+                  <div class="employee-status">
+                    <span class="status-badge" [attr.data-status]="employee.status">
+                      {{ getStatusLabel(employee.status) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="employee-info">
+                  <h4>{{ employee.firstName }} {{ employee.lastName }}</h4>
+                  <p class="position">{{ employee.position }}</p>
+                  <p class="department">{{ getDepartmentLabel(employee.department) }}</p>
+                  <div class="employee-details">
+                    <div class="detail-item">
+                      <i class="fas fa-id-card"></i>
+                      <span>{{ employee.employeeNumber }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <i class="fas fa-calendar-alt"></i>
+                      <span>{{ employee.hireDate | date: 'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <i class="fas fa-file-contract"></i>
+                      <span>{{ getContractTypeLabel(employee.contractType) }}</span>
+                    </div>
+                    <div class="detail-item salary">
+                      <i class="fas fa-euro-sign"></i>
+                      <span>{{ formatCurrency(employee.baseSalary) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="employee-actions">
+                  <button class="action-btn view" (click)="onViewEmployee(employee)" title="Voir détails">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="action-btn edit" (click)="onEditEmployee(employee)" title="Modifier">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="action-btn toggle" (click)="onToggleEmployeeStatus(employee)"
+                          [title]="employee.isActive ? 'Désactiver' : 'Activer'">
+                    <i class="fas" [class.fa-user-slash]="employee.isActive" [class.fa-user-check]="!employee.isActive"></i>
+                  </button>
+                  <button class="action-btn delete" (click)="onDeleteEmployee(employee)" title="Supprimer">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- List View -->
+        @if (viewMode() === 'list') {
+          <div class="employees-table">
+            <div class="table-header">
+              <div class="header-cell sortable" (click)="onSort('name')">
+                Employé
+                <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'name' && sortOrder() === 'asc'"
+                   [class.fa-sort-down]="sortBy() === 'name' && sortOrder() === 'desc'"></i>
+              </div>
+              <div class="header-cell sortable" (click)="onSort('department')">
+                Département
+                <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'department' && sortOrder() === 'asc'"
+                   [class.fa-sort-down]="sortBy() === 'department' && sortOrder() === 'desc'"></i>
+              </div>
+              <div class="header-cell sortable" (click)="onSort('position')">
+                Poste
+                <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'position' && sortOrder() === 'asc'"
+                   [class.fa-sort-down]="sortBy() === 'position' && sortOrder() === 'desc'"></i>
+              </div>
+              <div class="header-cell sortable" (click)="onSort('hireDate')">
+                Date d'embauche
+                <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'hireDate' && sortOrder() === 'asc'"
+                   [class.fa-sort-down]="sortBy() === 'hireDate' && sortOrder() === 'desc'"></i>
+              </div>
+              <div class="header-cell sortable" (click)="onSort('salary')">
+                Salaire
+                <i class="fas fa-sort" [class.fa-sort-up]="sortBy() === 'salary' && sortOrder() === 'asc'"
+                   [class.fa-sort-down]="sortBy() === 'salary' && sortOrder() === 'desc'"></i>
+              </div>
+              <div class="header-cell">Statut</div>
+              <div class="header-cell">Actions</div>
+            </div>
+
+            @for (employee of filteredEmployees(); track employee.id) {
+              <div class="table-row" [class.inactive]="!employee.isActive">
+                <div class="table-cell employee-cell">
+                  <div class="employee-avatar small">
+                    <span>{{ getEmployeeInitials(employee) }}</span>
+                  </div>
+                  <div class="employee-basic-info">
+                    <h5>{{ employee.firstName }} {{ employee.lastName }}</h5>
+                    <p>{{ employee.employeeNumber }}</p>
+                  </div>
+                </div>
+                <div class="table-cell">{{ getDepartmentLabel(employee.department) }}</div>
+                <div class="table-cell">{{ employee.position }}</div>
+                <div class="table-cell">{{ employee.hireDate | date: 'dd/MM/yyyy' }}</div>
+                <div class="table-cell salary-cell">{{ formatCurrency(employee.baseSalary) }}</div>
+                <div class="table-cell">
+                  <span class="status-badge" [attr.data-status]="employee.status">
+                    {{ getStatusLabel(employee.status) }}
+                  </span>
+                </div>
+                <div class="table-cell actions-cell">
+                  <div class="table-actions">
+                    <button class="action-btn view" (click)="onViewEmployee(employee)" title="Voir détails">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn edit" (click)="onEditEmployee(employee)" title="Modifier">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn toggle" (click)="onToggleEmployeeStatus(employee)"
+                            [title]="employee.isActive ? 'Désactiver' : 'Activer'">
+                      <i class="fas" [class.fa-user-slash]="employee.isActive" [class.fa-user-check]="!employee.isActive"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+  </div>
+</div>

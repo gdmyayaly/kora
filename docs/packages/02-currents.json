@@ -1,0 +1,39 @@
+{
+  "code": 200,
+  "data": {
+    "billing_cycle": "trial",
+    "currency": "XOF",
+    "description": "Free trial package with basic features",
+    "features": [
+      "Basic invoicing",
+      "1 company",
+      "20 bills per month"
+    ],
+    "is_trial": true,
+    "max_companies": 1,
+    "max_users": 1,
+    "max_workspaces": 1,
+    "name": "Trial",
+    "package_id": "9e94b4e2-f9ae-477e-a191-65538a430c2f",
+    "package_type": "trial",
+    "price": 0,
+    "subscription_expires_at": "2025-10-28T11:52:59.809226+00:00",
+    "subscription_status": "trial",
+    "usage_limits": {
+      "companies": {
+        "current": 1,
+        "max": 1,
+        "within_limit": true
+      },
+      "workspaces": {
+        "current": 1,
+        "max": 1,
+        "within_limit": true
+      }
+    },
+    "within_all_limits": true
+  },
+  "error": null,
+  "message": "Current package retrieved successfully",
+  "success": true
+}

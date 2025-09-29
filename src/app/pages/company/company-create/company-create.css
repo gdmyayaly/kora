@@ -1,0 +1,65 @@
+/* Animations pour les champs de formulaire */
+.form-field {
+  transition: all 0.2s ease;
+}
+
+/* Focus states améliorés */
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 4px 12px rgba(var(--primary), 0.15);
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animation pour les erreurs */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.border-red-500 {
+  animation: shake 0.3s ease-in-out;
+  box-shadow: 0 0 0 1px #ef4444 !important;
+}
+
+/* Animation d'apparition des sections */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-content {
+  animation: slideInUp 0.4s ease-out;
+}
+
+/* Amélioration du focus sur les boutons */
+button:focus {
+  outline: 2px solid rgba(var(--primary), 0.5);
+  outline-offset: 2px;
+}
+
+/* Style pour les champs requis */
+.required-field::after {
+  content: '*';
+  color: #ef4444;
+  margin-left: 2px;
+}

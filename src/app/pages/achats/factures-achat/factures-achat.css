@@ -1,0 +1,380 @@
+/* Animations pour les transitions */
+.transition-shadow {
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.transition-colors {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* Animation pour l'icône de chargement */
+.fa-spin {
+  animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation d'apparition pour les cartes métriques */
+.bg-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation des métriques avec délai */
+.bg-card:nth-child(1) { animation-delay: 0.1s; }
+.bg-card:nth-child(2) { animation-delay: 0.2s; }
+.bg-card:nth-child(3) { animation-delay: 0.3s; }
+.bg-card:nth-child(4) { animation-delay: 0.4s; }
+.bg-card:nth-child(5) { animation-delay: 0.5s; }
+
+/* Animation pour le graphique */
+.chart-bar {
+  animation: growUp 1s ease-out;
+  animation-fill-mode: both;
+}
+
+.chart-bar:nth-child(1) { animation-delay: 0.1s; }
+.chart-bar:nth-child(2) { animation-delay: 0.2s; }
+.chart-bar:nth-child(3) { animation-delay: 0.3s; }
+.chart-bar:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes growUp {
+  from {
+    height: 0%;
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Amélioration de l'accessibilité pour les boutons */
+button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Style pour les en-têtes de tableau avec tri */
+th.cursor-pointer:hover {
+  background-color: hsl(var(--muted) / 0.7);
+}
+
+th.cursor-pointer {
+  user-select: none;
+  position: relative;
+}
+
+th.cursor-pointer::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: hsl(var(--primary));
+  transition: width 0.3s ease-in-out;
+}
+
+th.cursor-pointer:hover::after {
+  width: 100%;
+}
+
+/* Animation pour les lignes de tableau */
+tbody tr {
+  transition: all 0.2s ease-in-out;
+}
+
+tbody tr:hover {
+  background-color: hsl(var(--muted) / 0.3);
+  transform: scale(1.001);
+}
+
+/* Style amélioré pour les badges de statut */
+.status-badge {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.status-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease-in-out;
+}
+
+.status-badge:hover::before {
+  left: 100%;
+}
+
+/* Animation pour les boutons d'action */
+.action-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+}
+
+.action-button:hover {
+  transform: scale(1.05);
+}
+
+.action-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+}
+
+.action-button:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+/* Style pour les montants avec mise en évidence */
+.amount-highlight {
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+.amount-highlight:hover {
+  color: hsl(var(--primary));
+  font-weight: 600;
+}
+
+/* Animation pour les indicateurs de retard */
+.overdue-indicator {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Style pour les pièces jointes */
+.attachment-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  background: hsl(var(--muted) / 0.5);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.attachment-indicator:hover {
+  background: hsl(var(--muted));
+  transform: scale(1.05);
+}
+
+/* Responsive design amélioré */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .flex.gap-4 {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  table {
+    font-size: 0.875rem;
+  }
+
+  th, td {
+    padding: 0.5rem;
+  }
+
+  .hidden-mobile {
+    display: none;
+  }
+}
+
+/* Style pour le graphique de tendances */
+.trend-chart {
+  background: linear-gradient(to top, hsl(var(--muted) / 0.1), transparent);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.trend-bar {
+  background: linear-gradient(to top, hsl(var(--primary)), hsl(var(--primary) / 0.7));
+  border-radius: 0.25rem 0.25rem 0 0;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.trend-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease-in-out;
+}
+
+.trend-bar:hover::before {
+  left: 100%;
+}
+
+.trend-bar:hover {
+  transform: scaleY(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Animation pour les filtres */
+.filter-section {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Style pour les tooltips */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Animation pour les éléments qui apparaissent */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Style pour les focus states améliorés */
+input:focus, select:focus {
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+  border-color: hsl(var(--primary));
+  outline: none;
+}
+
+/* Animation pour le contenu qui se charge */
+.loading-shimmer {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / 0.5) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Style pour les lignes importantes (en retard) */
+tr.overdue {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.05), transparent);
+  border-left: 3px solid rgb(239, 68, 68);
+}
+
+/* Animation staggered pour les éléments de la liste */
+.stagger-item {
+  animation: staggerIn 0.6s ease-out;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.05s; }
+.stagger-item:nth-child(2) { animation-delay: 0.1s; }
+.stagger-item:nth-child(3) { animation-delay: 0.15s; }
+.stagger-item:nth-child(4) { animation-delay: 0.2s; }
+.stagger-item:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Classes utilitaires pour la troncature de texte */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Style pour les indicateurs de priorité */
+.priority-high {
+  border-left: 4px solid rgb(239, 68, 68);
+}
+
+.priority-medium {
+  border-left: 4px solid rgb(245, 158, 11);
+}
+
+.priority-low {
+  border-left: 4px solid rgb(34, 197, 94);
+}

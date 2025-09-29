@@ -1,0 +1,553 @@
+<div class="page-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Nouvelle Facture</h1>
+        <p>Créez une nouvelle facture de vente en 3 étapes simples</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="onCancel()">
+          <i class="fas fa-times"></i>
+          Annuler
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="steps-container">
+      <div class="steps-progress">
+        @for (step of [1, 2, 3]; track step) {
+          <div
+            class="step"
+            [class.active]="currentStep() === step"
+            [class.completed]="currentStep() > step"
+            (click)="onGoToStep(step)"
+          >
+            <div class="step-indicator">
+              @if (currentStep() > step) {
+                <i class="fas fa-check"></i>
+              } @else {
+                {{ step }}
+              }
+            </div>
+            <div class="step-label">
+              @switch (step) {
+                @case (1) {
+                  Client
+                }
+                @case (2) {
+                  Articles
+                }
+                @case (3) {
+                  Récapitulatif
+                }
+              }
+            </div>
+          </div>
+          @if (step < 3) {
+            <div class="step-connector" [class.completed]="currentStep() > step"></div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="content-section">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Chargement des données...</p>
+      </div>
+    } @else {
+      <!-- Step 1: Customer Selection -->
+      @if (currentStep() === 1) {
+        <div class="step-content" [@slideIn]>
+          <div class="step-header">
+            <h2>
+              <i class="fas fa-user"></i>
+              Sélection du Client
+            </h2>
+            <p>Choisissez le client pour cette facture</p>
+          </div>
+
+          <div class="form-section">
+            <div class="form-group">
+              <label for="customerSearch">Rechercher un client *</label>
+              <div class="search-container">
+                <div class="search-input-wrapper">
+                  <i class="fas fa-search"></i>
+                  <input
+                    id="customerSearch"
+                    type="text"
+                    class="form-control search-input"
+                    placeholder="Tapez le nom du client ou de l'entreprise..."
+                    [value]="customerSearch()"
+                    (input)="onCustomerSearchChange($event.target.value)"
+                    (focus)="showCustomerDropdown.set(true)"
+                  />
+                  @if (formData().customer) {
+                    <button
+                      class="clear-btn"
+                      (click)="onSelectCustomer(null!); customerSearch.set('')"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  }
+                </div>
+
+                @if (showCustomerDropdown() && filteredCustomers().length > 0) {
+                  <div class="dropdown-menu">
+                    @for (customer of filteredCustomers(); track customer.id) {
+                      <div
+                        class="dropdown-item"
+                        (click)="onSelectCustomer(customer)"
+                      >
+                        <div class="customer-item">
+                          <div class="customer-avatar">
+                            {{ customer.name.charAt(0).toUpperCase() }}
+                          </div>
+                          <div class="customer-details">
+                            <div class="customer-name">{{ customer.name }}</div>
+                            <div class="customer-info">
+                              {{ customer.contactPerson }} • {{ customer.email }}
+                            </div>
+                            <div class="customer-location">
+                              {{ customer.address.city }}, {{ customer.address.country }}
+                            </div>
+                          </div>
+                          <div class="customer-stats">
+                            <div class="stat-item">
+                              <span class="stat-label">CA Total</span>
+                              <span class="stat-value">{{ formatCurrency(customer.totalSales) }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            @if (formData().customer) {
+              <div class="selected-customer">
+                <div class="customer-card">
+                  <div class="customer-header">
+                    <div class="customer-avatar large">
+                      {{ formData().customer!.name.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="customer-info">
+                      <h3>{{ formData().customer!.name }}</h3>
+                      <p>{{ formData().customer!.contactPerson }}</p>
+                      <p>{{ formData().customer!.email }}</p>
+                    </div>
+                  </div>
+                  <div class="customer-details">
+                    <div class="detail-row">
+                      <span class="label">Adresse:</span>
+                      <span class="value">
+                        {{ formData().customer!.address.street }},
+                        {{ formData().customer!.address.city }},
+                        {{ formData().customer!.address.country }}
+                      </span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Téléphone:</span>
+                      <span class="value">{{ formData().customer!.phone }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Conditions de paiement:</span>
+                      <span class="value">{{ formData().customer!.paymentTerms }} jours</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Step 2: Articles Selection -->
+      @if (currentStep() === 2) {
+        <div class="step-content" [@slideIn]>
+          <div class="step-header">
+            <h2>
+              <i class="fas fa-shopping-cart"></i>
+              Sélection des Articles
+            </h2>
+            <p>Ajoutez les produits et services à facturer</p>
+          </div>
+
+          <div class="form-section">
+            <div class="form-group">
+              <label for="articleSearch">Rechercher un article</label>
+              <div class="search-container">
+                <div class="search-input-wrapper">
+                  <i class="fas fa-search"></i>
+                  <input
+                    id="articleSearch"
+                    type="text"
+                    class="form-control search-input"
+                    placeholder="Tapez le nom de l'article ou le SKU..."
+                    [value]="articleSearch()"
+                    (input)="onArticleSearchChange($event.target.value)"
+                    (focus)="showArticleDropdown.set(true)"
+                  />
+                </div>
+
+                @if (showArticleDropdown() && filteredArticles().length > 0) {
+                  <div class="dropdown-menu">
+                    @for (article of filteredArticles(); track article.id) {
+                      <div
+                        class="dropdown-item"
+                        (click)="onAddArticle(article)"
+                      >
+                        <div class="article-item">
+                          <div class="article-image">
+                            @if (article.images.length > 0) {
+                              <img [src]="article.images[0]" [alt]="article.name" />
+                            } @else {
+                              <div class="placeholder-image">
+                                <i class="fas" [class.fa-box]="article.category === 'product'" [class.fa-cogs]="article.category === 'service'"></i>
+                              </div>
+                            }
+                          </div>
+                          <div class="article-details">
+                            <div class="article-name">{{ article.name }}</div>
+                            <div class="article-info">
+                              SKU: {{ article.sku }} • {{ article.subcategory }}
+                            </div>
+                            <div class="article-price">{{ formatCurrency(article.unitPrice) }}</div>
+                          </div>
+                          @if (article.category === 'product') {
+                            <div class="article-stock">
+                              <span class="stock-label">Stock:</span>
+                              <span class="stock-value">{{ article.stock.available }} {{ article.unit }}</span>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Invoice Items -->
+            @if (formData().items.length > 0) {
+              <div class="invoice-items">
+                <h3>Articles sélectionnés</h3>
+                <div class="items-table">
+                  <div class="items-header">
+                    <div class="col-article">Article</div>
+                    <div class="col-qty">Qté</div>
+                    <div class="col-price">Prix Unitaire</div>
+                    <div class="col-discount">Remise %</div>
+                    <div class="col-total">Total</div>
+                    <div class="col-actions">Actions</div>
+                  </div>
+
+                  @for (item of formData().items; track item.id) {
+                    <div class="item-row">
+                      <div class="col-article">
+                        <div class="item-info">
+                          <div class="item-name">{{ item.article.name }}</div>
+                          <div class="item-sku">{{ item.article.sku }}</div>
+                        </div>
+                      </div>
+                      <div class="col-qty">
+                        <div class="quantity-input">
+                          <button
+                            class="qty-btn"
+                            (click)="onUpdateItemQuantity(item.id, item.quantity - 1)"
+                          >
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <input
+                            type="number"
+                            class="qty-field"
+                            [value]="item.quantity"
+                            (change)="onUpdateItemQuantity(item.id, +$event.target.value)"
+                            min="1"
+                          />
+                          <button
+                            class="qty-btn"
+                            (click)="onUpdateItemQuantity(item.id, item.quantity + 1)"
+                          >
+                            <i class="fas fa-plus"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="col-price">
+                        <input
+                          type="number"
+                          class="price-input"
+                          [value]="item.unitPrice"
+                          (change)="onUpdateItemPrice(item.id, +$event.target.value)"
+                          step="0.01"
+                        />
+                      </div>
+                      <div class="col-discount">
+                        <input
+                          type="number"
+                          class="discount-input"
+                          [value]="item.discountRate"
+                          (change)="onUpdateItemDiscount(item.id, +$event.target.value)"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                        />
+                      </div>
+                      <div class="col-total">
+                        <span class="total-amount">
+                          {{ formatCurrency((item.quantity * item.unitPrice) * (1 - item.discountRate / 100)) }}
+                        </span>
+                      </div>
+                      <div class="col-actions">
+                        <button
+                          class="remove-btn"
+                          (click)="onRemoveItem(item.id)"
+                          title="Supprimer"
+                        >
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <!-- Quick totals -->
+                <div class="quick-totals">
+                  <div class="total-row">
+                    <span class="label">Sous-total:</span>
+                    <span class="value">{{ formatCurrency(calculations().subtotal) }}</span>
+                  </div>
+                  <div class="total-row">
+                    <span class="label">TVA:</span>
+                    <span class="value">{{ formatCurrency(calculations().taxAmount) }}</span>
+                  </div>
+                  <div class="total-row total">
+                    <span class="label">Total:</span>
+                    <span class="value">{{ formatCurrency(calculations().totalAmount) }}</span>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="empty-items">
+                <i class="fas fa-shopping-cart fa-3x"></i>
+                <h3>Aucun article sélectionné</h3>
+                <p>Recherchez et ajoutez des articles à votre facture</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Step 3: Summary -->
+      @if (currentStep() === 3) {
+        <div class="step-content" [@slideIn]>
+          <div class="step-header">
+            <h2>
+              <i class="fas fa-file-invoice"></i>
+              Récapitulatif de la Facture
+            </h2>
+            <p>Vérifiez les détails avant de créer la facture</p>
+          </div>
+
+          <div class="summary-content">
+            <div class="summary-grid">
+              <!-- Customer Summary -->
+              <div class="summary-card">
+                <h3>
+                  <i class="fas fa-user"></i>
+                  Informations Client
+                </h3>
+                @if (formData().customer) {
+                  <div class="summary-details">
+                    <div class="detail-item">
+                      <span class="label">Nom:</span>
+                      <span class="value">{{ formData().customer!.name }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="label">Contact:</span>
+                      <span class="value">{{ formData().customer!.contactPerson }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="label">Email:</span>
+                      <span class="value">{{ formData().customer!.email }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Invoice Details -->
+              <div class="summary-card">
+                <h3>
+                  <i class="fas fa-calendar"></i>
+                  Détails Facture
+                </h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="issueDate">Date d'émission</label>
+                    <input
+                      id="issueDate"
+                      type="date"
+                      class="form-control"
+                      [value]="formData().issueDate"
+                      (change)="onIssueDateChange($event)"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="dueDate">Date d'échéance</label>
+                    <input
+                      id="dueDate"
+                      type="date"
+                      class="form-control"
+                      [value]="formData().dueDate"
+                      (change)="onDueDateChange($event)"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="description">Description</label>
+                  <input
+                    id="description"
+                    type="text"
+                    class="form-control"
+                    placeholder="Description de la facture"
+                    [value]="formData().description"
+                    (input)="onDescriptionChange($event)"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Items Summary -->
+            <div class="summary-card full-width">
+              <h3>
+                <i class="fas fa-list"></i>
+                Articles ({{ formData().items.length }})
+              </h3>
+              @if (formData().items.length > 0) {
+                <div class="items-summary">
+                  @for (item of formData().items; track item.id) {
+                    <div class="summary-item">
+                      <div class="item-details">
+                        <span class="item-name">{{ item.article.name }}</span>
+                        <span class="item-quantity">{{ item.quantity }} × {{ formatCurrency(item.unitPrice) }}</span>
+                        @if (item.discountRate > 0) {
+                          <span class="item-discount">Remise {{ item.discountRate }}%</span>
+                        }
+                      </div>
+                      <div class="item-total">
+                        {{ formatCurrency((item.quantity * item.unitPrice) * (1 - item.discountRate / 100)) }}
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="financial-summary">
+              <div class="summary-calculations">
+                <div class="calc-row">
+                  <span class="label">Sous-total HT:</span>
+                  <span class="value">{{ formatCurrency(calculations().subtotal) }}</span>
+                </div>
+                <div class="calc-row">
+                  <span class="label">TVA:</span>
+                  <span class="value">{{ formatCurrency(calculations().taxAmount) }}</span>
+                </div>
+                <div class="calc-row">
+                  <span class="label">Remise globale:</span>
+                  <div class="discount-input-group">
+                    <input
+                      type="number"
+                      class="discount-amount-input"
+                      [value]="formData().discountAmount"
+                      (change)="onDiscountAmountChange($event)"
+                      min="0"
+                      step="1000"
+                    />
+                    <span class="currency">FCFA</span>
+                  </div>
+                </div>
+                <div class="calc-row total-row">
+                  <span class="label">Total TTC:</span>
+                  <span class="value">{{ formatCurrency(calculations().totalAmount) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="form-group">
+              <label for="notes">Notes (optionnel)</label>
+              <textarea
+                id="notes"
+                class="form-control"
+                rows="3"
+                placeholder="Notes ou commentaires pour cette facture..."
+                [value]="formData().notes"
+                (input)="onNotesChange($event)"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Navigation Actions -->
+      <div class="navigation-actions">
+        <div class="nav-left">
+          @if (currentStep() > 1) {
+            <button class="btn btn-secondary" (click)="onPreviousStep()">
+              <i class="fas fa-arrow-left"></i>
+              Précédent
+            </button>
+          }
+        </div>
+
+        <div class="nav-right">
+          @if (currentStep() < totalSteps) {
+            <button
+              class="btn btn-primary"
+              [disabled]="!isStepValid()"
+              (click)="onNextStep()"
+            >
+              Suivant
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          } @else {
+            <!-- Final step actions -->
+            <button
+              class="btn btn-outline"
+              [disabled]="isSaving()"
+              (click)="onSaveAsDraft()"
+            >
+              @if (isSaving()) {
+                <i class="fas fa-spinner fa-spin"></i>
+              } @else {
+                <i class="fas fa-save"></i>
+              }
+              Sauvegarder brouillon
+            </button>
+            <button
+              class="btn btn-primary"
+              [disabled]="isSaving()"
+              (click)="onCreateAndSend()"
+            >
+              @if (isSaving()) {
+                <i class="fas fa-spinner fa-spin"></i>
+              } @else {
+                <i class="fas fa-paper-plane"></i>
+              }
+              Créer et envoyer
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

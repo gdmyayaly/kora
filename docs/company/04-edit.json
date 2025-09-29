@@ -1,0 +1,14 @@
+{
+  "address": "456 Updated Business St",
+  "city": "Dakar",
+  "country": "Sénégal",
+  "currency": "XOF",
+  "description": "An updated technology company",
+  "email": "updated@acme.com",
+  "fiscal_number": "123456789",
+  "legal_form": "sarl",
+  "name": "Acme Corporation Updated",
+  "phone": "+221-77-123-4568",
+  "postal_code": "10002",
+  "website": "https://updated.acme.com"
+}

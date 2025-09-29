@@ -1,0 +1,436 @@
+<div class="min-h-screen bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-900 dark:to-gray-800 p-6">
+  <div class="max-w-7xl mx-auto space-y-8">
+
+    <!-- Header Section -->
+    <div class="text-center space-y-4">
+      <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl shadow-2xl mb-4">
+        <i class="fas fa-file-invoice-dollar text-white text-3xl"></i>
+      </div>
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">
+        Factures d'Achat
+      </h1>
+      <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+        Gérez et suivez vos factures d'achat avec des analyses détaillées et des graphiques en temps réel
+      </p>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="flex flex-wrap justify-center gap-4">
+      <button
+        (click)="onCreateInvoice()"
+        class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+        <i class="fas fa-plus mr-3"></i>
+        Nouvelle Facture
+      </button>
+      <button
+        (click)="onImportInvoices()"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 px-8 py-3 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 font-semibold">
+        <i class="fas fa-upload mr-3"></i>
+        Importer
+      </button>
+      <button
+        (click)="onExportExcel()"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 px-8 py-3 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 font-semibold">
+        <i class="fas fa-file-excel mr-3 text-green-600"></i>
+        Exporter Excel
+      </button>
+      <button
+        (click)="onRefresh()"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 px-8 py-3 rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 font-semibold">
+        <i class="fas fa-sync-alt mr-3 text-blue-600"></i>
+        Actualiser
+      </button>
+    </div>
+
+    <!-- Métriques principales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-2xl transform hover:scale-105 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Total Mensuel</p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(metrics().totalAmount) }}</p>
+          </div>
+          <div class="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-2xl flex items-center justify-center">
+            <i class="fas fa-coins text-green-600 dark:text-green-400 text-2xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-2xl transform hover:scale-105 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">En Attente</p>
+            <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ metrics().pending }}</p>
+          </div>
+          <div class="w-16 h-16 bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900 dark:to-yellow-800 rounded-2xl flex items-center justify-center">
+            <i class="fas fa-hourglass-half text-yellow-600 dark:text-yellow-400 text-2xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-2xl transform hover:scale-105 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Approuvées</p>
+            <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ metrics().approved }}</p>
+          </div>
+          <div class="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-2xl flex items-center justify-center">
+            <i class="fas fa-check-circle text-blue-600 dark:text-blue-400 text-2xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-2xl transform hover:scale-105 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Payées</p>
+            <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ metrics().paid }}</p>
+          </div>
+          <div class="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-2xl flex items-center justify-center">
+            <i class="fas fa-money-check-alt text-green-600 dark:text-green-400 text-2xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-2xl transform hover:scale-105 transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">En Retard</p>
+            <p class="text-3xl font-bold text-red-600 dark:text-red-400">{{ metrics().overdue }}</p>
+          </div>
+          <div class="w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 rounded-2xl flex items-center justify-center">
+            <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-2xl"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Distribution par fournisseur -->
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl">
+        <div class="flex items-center mb-6">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mr-4">
+            <i class="fas fa-chart-pie text-white text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Distribution par Fournisseur</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Répartition des montants</p>
+          </div>
+        </div>
+        <div class="h-64">
+          <app-bar-chart
+            [labels]="chartData().supplierAmounts.labels"
+            [datasets]="[{
+              data: chartData().supplierAmounts.data,
+              label: 'Montant (XOF)',
+              backgroundColor: [
+                'rgba(34, 197, 94, 0.8)',
+                'rgba(59, 130, 246, 0.8)',
+                'rgba(147, 51, 234, 0.8)',
+                'rgba(239, 68, 68, 0.8)',
+                'rgba(245, 158, 11, 0.8)'
+              ],
+              borderColor: [
+                'rgba(34, 197, 94, 1)',
+                'rgba(59, 130, 246, 1)',
+                'rgba(147, 51, 234, 1)',
+                'rgba(239, 68, 68, 1)',
+                'rgba(245, 158, 11, 1)'
+              ],
+              borderWidth: 2
+            }]">
+          </app-bar-chart>
+        </div>
+      </div>
+
+      <!-- Tendance mensuelle -->
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl">
+        <div class="flex items-center mb-6">
+          <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mr-4">
+            <i class="fas fa-chart-line text-white text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Tendance Mensuelle</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Évolution des factures</p>
+          </div>
+        </div>
+        <div class="h-64">
+          <app-line-chart
+            [labels]="chartData().monthlyTrend.labels"
+            [datasets]="[{
+              data: chartData().monthlyTrend.data,
+              label: 'Montant (XOF)',
+              borderColor: 'rgba(34, 197, 94, 1)',
+              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+              tension: 0.4,
+              fill: true
+            }]">
+          </app-line-chart>
+        </div>
+      </div>
+
+      <!-- Distribution par statut -->
+      <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl">
+        <div class="flex items-center mb-6">
+          <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mr-4">
+            <i class="fas fa-chart-doughnut text-white text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Distribution par Statut</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Répartition par état</p>
+          </div>
+        </div>
+        <div class="h-64">
+          <app-pie-chart
+            [labels]="chartData().statusDistribution.labels"
+            [data]="chartData().statusDistribution.data"
+            [colors]="[
+              'rgba(34, 197, 94, 0.8)',
+              'rgba(59, 130, 246, 0.8)',
+              'rgba(245, 158, 11, 0.8)',
+              'rgba(239, 68, 68, 0.8)',
+              'rgba(156, 163, 175, 0.8)'
+            ]">
+          </app-pie-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl">
+      <div class="flex flex-wrap gap-6 items-center">
+        <!-- Recherche -->
+        <div class="flex-1 min-w-80">
+          <div class="relative">
+            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <input
+              type="text"
+              placeholder="Rechercher par numéro, fournisseur ou description..."
+              [value]="searchTerm()"
+              (input)="onSearchChange($event)"
+              class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border-0 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
+          </div>
+        </div>
+
+        <!-- Filtre statut -->
+        <div class="relative">
+          <select
+            [value]="selectedStatus()"
+            (change)="onStatusFilterChange($event)"
+            class="appearance-none bg-gray-50 dark:bg-gray-700 border-0 rounded-2xl px-6 py-3 pr-10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 min-w-40">
+            <option value="all">Tous les statuts</option>
+            <option value="draft">Brouillon</option>
+            <option value="pending">En attente</option>
+            <option value="approved">Approuvées</option>
+            <option value="paid">Payées</option>
+            <option value="overdue">En retard</option>
+            <option value="cancelled">Annulées</option>
+          </select>
+          <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+        </div>
+
+        <!-- Filtre fournisseur -->
+        <div class="relative">
+          <select
+            [value]="selectedSupplier()"
+            (change)="onSupplierFilterChange($event)"
+            class="appearance-none bg-gray-50 dark:bg-gray-700 border-0 rounded-2xl px-6 py-3 pr-10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 min-w-48">
+            <option value="all">Tous les fournisseurs</option>
+            @for (supplier of availableSuppliers(); track supplier.id) {
+              <option [value]="supplier.id">{{ supplier.name }}</option>
+            }
+          </select>
+          <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+        </div>
+
+        <!-- Filtre période -->
+        <div class="relative">
+          <select
+            [value]="dateRange()"
+            (change)="onDateRangeChange($event)"
+            class="appearance-none bg-gray-50 dark:bg-gray-700 border-0 rounded-2xl px-6 py-3 pr-10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 min-w-40">
+            <option value="all">Toutes les périodes</option>
+            <option value="thisMonth">Ce mois</option>
+            <option value="lastMonth">Mois dernier</option>
+            <option value="thisYear">Cette année</option>
+          </select>
+          <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+        </div>
+
+        <!-- Options de tri -->
+        <div class="flex gap-2">
+          <button
+            (click)="onSortChange('date')"
+            [class]="sortBy() === 'date' ? 'bg-green-500 text-white' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+            class="px-4 py-3 rounded-2xl font-medium transition-all duration-200 hover:shadow-lg">
+            Date
+            @if (sortBy() === 'date') {
+              <i [class]="sortOrder() === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'" class="ml-2"></i>
+            }
+          </button>
+          <button
+            (click)="onSortChange('amount')"
+            [class]="sortBy() === 'amount' ? 'bg-green-500 text-white' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+            class="px-4 py-3 rounded-2xl font-medium transition-all duration-200 hover:shadow-lg">
+            Montant
+            @if (sortBy() === 'amount') {
+              <i [class]="sortOrder() === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'" class="ml-2"></i>
+            }
+          </button>
+          <button
+            (click)="onSortChange('supplier')"
+            [class]="sortBy() === 'supplier' ? 'bg-green-500 text-white' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200'"
+            class="px-4 py-3 rounded-2xl font-medium transition-all duration-200 hover:shadow-lg">
+            Fournisseur
+            @if (sortBy() === 'supplier') {
+              <i [class]="sortOrder() === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'" class="ml-2"></i>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="text-center py-12">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full animate-spin mb-4">
+          <i class="fas fa-spinner text-green-600 dark:text-green-400 text-2xl"></i>
+        </div>
+        <p class="text-gray-600 dark:text-gray-400 font-medium">Chargement des factures...</p>
+      </div>
+    }
+
+    <!-- Liste des factures -->
+    @else {
+      <div class="space-y-6">
+        @if (filteredInvoices().length === 0) {
+          <div class="text-center py-16">
+            <div class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <i class="fas fa-file-invoice text-gray-400 text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-600 dark:text-gray-300 mb-2">Aucune facture trouvée</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-8">Il n'y a aucune facture correspondant à vos critères de recherche.</p>
+            <button
+              (click)="onCreateInvoice()"
+              class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold">
+              <i class="fas fa-plus mr-3"></i>
+              Créer votre première facture
+            </button>
+          </div>
+        } @else {
+          <div class="grid gap-6">
+            @for (invoice of filteredInvoices(); track invoice.id) {
+              <div class="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center">
+                  <!-- Informations principales -->
+                  <div class="lg:col-span-2">
+                    <div class="flex items-start gap-4">
+                      <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-file-invoice text-white text-xl"></i>
+                      </div>
+                      <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                          <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ invoice.invoiceNumber }}</h3>
+                          <span
+                            [class]="'px-3 py-1 rounded-full text-sm font-medium ' + (
+                              invoice.status === 'paid' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
+                              invoice.status === 'approved' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                              invoice.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200' :
+                              invoice.status === 'overdue' ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200' :
+                              invoice.status === 'draft' ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' :
+                              'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                            )">
+                            {{ getStatusLabel(invoice.status) }}
+                          </span>
+                        </div>
+                        <p class="font-semibold text-gray-900 dark:text-white mb-1">{{ invoice.supplierName }}</p>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-2">{{ invoice.description }}</p>
+                        <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                          <span><i class="fas fa-calendar mr-1"></i>{{ formatDate(invoice.issueDate) }}</span>
+                          <span><i class="fas fa-clock mr-1"></i>Échéance: {{ formatDate(invoice.dueDate) }}</span>
+                          @if (invoice.status === 'overdue') {
+                            <span class="text-red-600 dark:text-red-400 font-medium">
+                              <i class="fas fa-exclamation-triangle mr-1"></i>
+                              {{ getDaysUntilDue(invoice.dueDate) > 0 ? 'Dans ' + getDaysUntilDue(invoice.dueDate) + ' jours' : Math.abs(getDaysUntilDue(invoice.dueDate)) + ' jours de retard' }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Montant -->
+                  <div class="text-center lg:text-left">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Montant total</p>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(invoice.totalAmount, invoice.currency) }}</p>
+                    @if (invoice.currency !== 'XOF') {
+                      <p class="text-sm text-gray-500 dark:text-gray-400">{{ invoice.currency }}</p>
+                    }
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="flex flex-wrap gap-2 justify-center lg:justify-end">
+                    @if (invoice.status === 'draft') {
+                      <button
+                        (click)="onEditInvoice(invoice)"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-medium transition-colors">
+                        <i class="fas fa-edit mr-2"></i>Modifier
+                      </button>
+                    }
+                    @if (invoice.status === 'pending') {
+                      <button
+                        (click)="onApproveInvoice(invoice)"
+                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-medium transition-colors">
+                        <i class="fas fa-check mr-2"></i>Approuver
+                      </button>
+                    }
+                    @if (invoice.status === 'approved') {
+                      <button
+                        (click)="onPayInvoice(invoice)"
+                        class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-medium transition-colors">
+                        <i class="fas fa-money-check-alt mr-2"></i>Payer
+                      </button>
+                    }
+                    <button
+                      (click)="onEditInvoice(invoice)"
+                      class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl font-medium transition-colors">
+                      <i class="fas fa-eye mr-2"></i>Voir
+                    </button>
+                    <button
+                      (click)="onDeleteInvoice(invoice)"
+                      class="bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 text-red-700 dark:text-red-200 px-4 py-2 rounded-xl font-medium transition-colors">
+                      <i class="fas fa-trash mr-2"></i>Supprimer
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Détails supplémentaires (collapsible) -->
+                @if (invoice.items && invoice.items.length > 0) {
+                  <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Articles ({{ invoice.items.length }})</h4>
+                    <div class="grid gap-2">
+                      @for (item of invoice.items.slice(0, 2); track item.id) {
+                        <div class="flex justify-between items-center text-sm">
+                          <span class="text-gray-600 dark:text-gray-400">{{ item.description }}</span>
+                          <span class="font-medium text-gray-900 dark:text-white">{{ formatCurrency(item.totalPrice) }}</span>
+                        </div>
+                      }
+                      @if (invoice.items.length > 2) {
+                        <div class="text-sm text-gray-500 dark:text-gray-400 italic">
+                          ... et {{ invoice.items.length - 2 }} autre(s) article(s)
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Pagination would go here if needed -->
+  </div>
+</div>

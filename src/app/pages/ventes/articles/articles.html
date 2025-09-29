@@ -1,0 +1,412 @@
+<div class="page-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Gestion des Articles</h1>
+        <p>Gérez votre catalogue de produits et services</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="onRefresh()">
+          <i class="fas fa-sync-alt"></i>
+          Actualiser
+        </button>
+        <button class="btn btn-primary" (click)="onCreateArticle()">
+          <i class="fas fa-plus"></i>
+          Nouvel article
+        </button>
+      </div>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card total">
+        <div class="metric-icon">
+          <i class="fas fa-boxes"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ metrics().totalProducts }}</div>
+          <div class="metric-label">Total Articles</div>
+          <div class="metric-breakdown">
+            {{ metrics().activeProducts }} actifs
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card value">
+        <div class="metric-icon">
+          <i class="fas fa-coins"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ formatCurrency(metrics().totalValue) }}</div>
+          <div class="metric-label">Valeur du Stock</div>
+          <div class="metric-trend positive">
+            <i class="fas fa-arrow-up"></i>
+            +5% ce mois
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card alerts">
+        <div class="metric-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ stockAlerts().lowStock.length + stockAlerts().outOfStock.length }}</div>
+          <div class="metric-label">Alertes Stock</div>
+          <div class="metric-breakdown">
+            <span class="alert-detail">{{ stockAlerts().outOfStock.length }} ruptures</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card sales">
+        <div class="metric-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ metrics().topSellingProducts.length > 0 ? metrics().topSellingProducts[0].quantity : 0 }}</div>
+          <div class="metric-label">Top Ventes</div>
+          <div class="metric-breakdown">
+            @if (metrics().topSellingProducts.length > 0) {
+              {{ metrics().topSellingProducts[0].product.substring(0, 20) }}...
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Alerts Section -->
+  @if (stockAlerts().lowStock.length > 0 || stockAlerts().outOfStock.length > 0) {
+    <div class="alerts-section">
+      <div class="alerts-header">
+        <h3>
+          <i class="fas fa-exclamation-triangle"></i>
+          Alertes de Stock
+        </h3>
+      </div>
+      <div class="alerts-grid">
+        @if (stockAlerts().outOfStock.length > 0) {
+          <div class="alert-card critical">
+            <div class="alert-icon">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="alert-content">
+              <h4>Rupture de Stock</h4>
+              <p>{{ stockAlerts().outOfStock.length }} article(s) en rupture</p>
+              <div class="alert-items">
+                @for (item of stockAlerts().outOfStock.slice(0, 3); track item.id) {
+                  <span class="alert-item">{{ item.name }}</span>
+                }
+                @if (stockAlerts().outOfStock.length > 3) {
+                  <span class="alert-more">+{{ stockAlerts().outOfStock.length - 3 }} autres</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (stockAlerts().lowStock.length > 0) {
+          <div class="alert-card warning">
+            <div class="alert-icon">
+              <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="alert-content">
+              <h4>Stock Bas</h4>
+              <p>{{ stockAlerts().lowStock.length }} article(s) avec stock faible</p>
+              <div class="alert-items">
+                @for (item of stockAlerts().lowStock.slice(0, 3); track item.id) {
+                  <span class="alert-item">{{ item.name }} ({{ item.stock.available }})</span>
+                }
+                @if (stockAlerts().lowStock.length > 3) {
+                  <span class="alert-more">+{{ stockAlerts().lowStock.length - 3 }} autres</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Filters and Controls -->
+  <div class="controls-section">
+    <div class="filters">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          placeholder="Rechercher un article..."
+          [value]="searchTerm()"
+          (input)="onSearchChange($event)"
+        />
+      </div>
+
+      <select
+        class="filter-select"
+        [value]="selectedCategory()"
+        (change)="onCategoryFilterChange($event)"
+      >
+        <option value="all">Tous les types</option>
+        <option value="product">Produits</option>
+        <option value="service">Services</option>
+      </select>
+
+      <select
+        class="filter-select"
+        [value]="selectedSubcategory()"
+        (change)="onSubcategoryFilterChange($event)"
+      >
+        <option value="all">Toutes les catégories</option>
+        <option value="Informatique">Informatique</option>
+        <option value="Conseil">Conseil</option>
+        <option value="Maintenance">Maintenance</option>
+      </select>
+
+      <select
+        class="filter-select"
+        [value]="selectedStatus()"
+        (change)="onStatusFilterChange($event)"
+      >
+        <option value="all">Tous les statuts</option>
+        <option value="active">Actif</option>
+        <option value="inactive">Inactif</option>
+      </select>
+    </div>
+
+    <div class="view-controls">
+      <div class="view-mode-toggle">
+        <button
+          class="view-btn"
+          [class.active]="viewMode() === 'grid'"
+          (click)="onViewModeChange('grid')"
+        >
+          <i class="fas fa-th-large"></i>
+        </button>
+        <button
+          class="view-btn"
+          [class.active]="viewMode() === 'list'"
+          (click)="onViewModeChange('list')"
+        >
+          <i class="fas fa-list"></i>
+        </button>
+      </div>
+
+      <button class="btn btn-outline" (click)="onExportExcel()">
+        <i class="fas fa-file-excel"></i>
+        Exporter Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="content-section">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Chargement des articles...</p>
+      </div>
+    } @else if (filteredArticles().length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-boxes fa-3x"></i>
+        <h3>Aucun article trouvé</h3>
+        <p>
+          @if (searchTerm() || selectedCategory() !== 'all' || selectedSubcategory() !== 'all' || selectedStatus() !== 'all') {
+            Aucun article ne correspond à vos critères de recherche.
+          } @else {
+            Commencez par créer votre premier article ou service.
+          }
+        </p>
+        @if (!searchTerm() && selectedCategory() === 'all' && selectedSubcategory() === 'all' && selectedStatus() === 'all') {
+          <button class="btn btn-primary" (click)="onCreateArticle()">
+            <i class="fas fa-plus"></i>
+            Créer un article
+          </button>
+        }
+      </div>
+    } @else {
+      @if (viewMode() === 'grid') {
+        <!-- Grid View -->
+        <div class="articles-grid">
+          @for (article of filteredArticles(); track article.id) {
+            <div class="article-card" [attr.data-status]="article.isActive ? 'active' : 'inactive'">
+              <div class="card-image">
+                @if (article.images.length > 0) {
+                  <img [src]="article.images[0]" [alt]="article.name" />
+                } @else {
+                  <div class="placeholder-image">
+                    <i class="fas" [class.fa-box]="article.category === 'product'" [class.fa-cogs]="article.category === 'service'"></i>
+                  </div>
+                }
+                <div class="card-badges">
+                  <span class="category-badge" [attr.data-category]="article.category">
+                    {{ getCategoryLabel(article.category) }}
+                  </span>
+                  <span class="stock-badge" [attr.data-status]="getStockStatus(article)">
+                    {{ getStockStatusLabel(getStockStatus(article)) }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-content">
+                <h3 class="article-name">{{ article.name }}</h3>
+                <p class="article-description">{{ article.description }}</p>
+
+                <div class="article-details">
+                  <div class="detail-row">
+                    <span class="detail-label">SKU:</span>
+                    <span class="detail-value">{{ article.sku }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Prix:</span>
+                    <span class="detail-value price">{{ formatCurrency(article.unitPrice) }}</span>
+                  </div>
+                  @if (article.category === 'product') {
+                    <div class="detail-row">
+                      <span class="detail-label">Stock:</span>
+                      <span class="detail-value stock" [attr.data-status]="getStockStatus(article)">
+                        {{ article.stock.available }} {{ article.unit }}
+                      </span>
+                    </div>
+                  }
+                  <div class="detail-row">
+                    <span class="detail-label">Vendus:</span>
+                    <span class="detail-value">{{ article.totalSold }}</span>
+                  </div>
+                </div>
+
+                <div class="progress-section">
+                  <div class="progress-label">
+                    <span>Marge: {{ getMarginPercentage(article) | number:'1.0-1' }}%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="getMarginPercentage(article)"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-actions">
+                <button class="action-btn" (click)="onEditArticle(article)" title="Modifier">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="action-btn"
+                  (click)="onToggleArticleStatus(article)"
+                  [title]="article.isActive ? 'Désactiver' : 'Activer'"
+                >
+                  <i class="fas" [class.fa-pause]="article.isActive" [class.fa-play]="!article.isActive"></i>
+                </button>
+                <button class="action-btn danger" (click)="onDeleteArticle(article)" title="Supprimer">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- List View -->
+        <div class="articles-table-container">
+          <table class="articles-table">
+            <thead>
+              <tr>
+                <th>Article</th>
+                <th
+                  class="sortable"
+                  [class.sorted]="sortBy() === 'price'"
+                  [class.asc]="sortBy() === 'price' && sortOrder() === 'asc'"
+                  (click)="onSort('price')"
+                >
+                  Prix
+                  <i class="fas fa-sort"></i>
+                </th>
+                <th
+                  class="sortable"
+                  [class.sorted]="sortBy() === 'stock'"
+                  [class.asc]="sortBy() === 'stock' && sortOrder() === 'asc'"
+                  (click)="onSort('stock')"
+                >
+                  Stock
+                  <i class="fas fa-sort"></i>
+                </th>
+                <th
+                  class="sortable"
+                  [class.sorted]="sortBy() === 'sales'"
+                  [class.asc]="sortBy() === 'sales' && sortOrder() === 'asc'"
+                  (click)="onSort('sales')"
+                >
+                  Vendus
+                  <i class="fas fa-sort"></i>
+                </th>
+                <th>Marge</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (article of filteredArticles(); track article.id) {
+                <tr [attr.data-status]="article.isActive ? 'active' : 'inactive'">
+                  <td class="article-info">
+                    <div class="article-image">
+                      @if (article.images.length > 0) {
+                        <img [src]="article.images[0]" [alt]="article.name" />
+                      } @else {
+                        <div class="placeholder-image">
+                          <i class="fas" [class.fa-box]="article.category === 'product'" [class.fa-cogs]="article.category === 'service'"></i>
+                        </div>
+                      }
+                    </div>
+                    <div class="article-details">
+                      <div class="article-name">{{ article.name }}</div>
+                      <div class="article-sku">{{ article.sku }}</div>
+                      <div class="article-category">{{ article.subcategory }}</div>
+                    </div>
+                  </td>
+                  <td class="currency">{{ formatCurrency(article.unitPrice) }}</td>
+                  <td>
+                    @if (article.category === 'product') {
+                      <span class="stock-value" [attr.data-status]="getStockStatus(article)">
+                        {{ article.stock.available }} {{ article.unit }}
+                      </span>
+                    } @else {
+                      <span class="text-muted">Service</span>
+                    }
+                  </td>
+                  <td class="sales-count">{{ article.totalSold }}</td>
+                  <td>
+                    <div class="margin-display">
+                      <span class="margin-percentage">{{ getMarginPercentage(article) | number:'1.0-1' }}%</span>
+                      <div class="margin-bar">
+                        <div class="margin-fill" [style.width.%]="getMarginPercentage(article)"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [attr.data-status]="article.isActive ? 'active' : 'inactive'">
+                      {{ article.isActive ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </td>
+                  <td class="table-actions">
+                    <button class="action-btn" (click)="onEditArticle(article)" title="Modifier">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      class="action-btn"
+                      (click)="onToggleArticleStatus(article)"
+                      [title]="article.isActive ? 'Désactiver' : 'Activer'"
+                    >
+                      <i class="fas" [class.fa-pause]="article.isActive" [class.fa-play]="!article.isActive"></i>
+                    </button>
+                    <button class="action-btn danger" (click)="onDeleteArticle(article)" title="Supprimer">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+</div>

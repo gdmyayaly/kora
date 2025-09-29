@@ -1,0 +1,62 @@
+{
+  "code": 200,
+  "data": {
+    "auth_data": {
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "created_at": "2025-09-28 11:52:59.115922+00:00",
+      "email": "devyayaly@gmail.com",
+      "email_verified": true,
+      "id": "b989fec3-719c-4d6f-a283-31661f25e405",
+      "phone": "",
+      "phone_verified": false,
+      "updated_at": "2025-09-28 14:36:25.377697+00:00",
+      "user_metadata": {
+        "address_line1": "123 Main St",
+        "address_line2": "Apt 4B",
+        "city": "New York",
+        "country": "USA",
+        "display_name": "John Doe",
+        "email": "devyayaly@gmail.com",
+        "email_verified": true,
+        "first_name": "John",
+        "last_name": "Doe",
+        "phone": "+1234567890",
+        "phone_verified": false,
+        "postal_code": "10001",
+        "sub": "b989fec3-719c-4d6f-a283-31661f25e405"
+      }
+    },
+    "profile_data": {
+      "address_line1": "123 Main St",
+      "address_line2": "Apt 4B",
+      "city": "New York",
+      "country": "USA",
+      "created_at": "2025-09-28T11:52:59.115534+00:00",
+      "display_name": "John Doe",
+      "email": "devyayaly@gmail.com",
+      "first_name": "John",
+      "is_active": true,
+      "is_first_login": true,
+      "last_name": "Doe",
+      "onboarding_completed": false,
+      "package_id": "9e94b4e2-f9ae-477e-a191-65538a430c2f",
+      "phone": "+1234567890",
+      "postal_code": "10001",
+      "profile_id": "b989fec3-719c-4d6f-a283-31661f25e405",
+      "status": "active",
+      "subscription_expires_at": "2025-10-28T11:52:59.809226+00:00",
+      "subscription_status": "trial",
+      "total_companies_created": 1,
+      "updated_at": "2025-09-28T11:52:59.556205+00:00"
+    },
+    "user_id": "b989fec3-719c-4d6f-a283-31661f25e405"
+  },
+  "error": null,
+  "message": "User data updated successfully in both auth and profile",
+  "success": true
+}

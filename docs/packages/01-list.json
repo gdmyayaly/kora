@@ -1,0 +1,112 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "billing_cycle": "trial",
+      "created_at": "2025-09-17T12:08:58.443638",
+      "currency": "XOF",
+      "description": "Free trial package with basic features",
+      "features": [
+        "Basic invoicing",
+        "1 company",
+        "20 bills per month"
+      ],
+      "is_active": true,
+      "max_companies": 1,
+      "max_users": 1,
+      "max_workspaces": 1,
+      "name": "Trial",
+      "package_id": "9e94b4e2-f9ae-477e-a191-65538a430c2f",
+      "package_type": "trial",
+      "price": 0,
+      "updated_at": "2025-09-17T12:08:58.443638"
+    },
+    {
+      "billing_cycle": "monthly",
+      "created_at": "2025-09-17T12:08:58.443638",
+      "currency": "XOF",
+      "description": "Professional package for small businesses",
+      "features": [
+        "Unlimited invoicing",
+        "3 companies",
+        "Unlimited bills",
+        "Basic support"
+      ],
+      "is_active": true,
+      "max_companies": 3,
+      "max_users": 5,
+      "max_workspaces": 3,
+      "name": "Pro",
+      "package_id": "417546a5-b127-4301-b0d0-fb793a74acf2",
+      "package_type": "subscription",
+      "price": 15000,
+      "updated_at": "2025-09-17T12:08:58.443638"
+    },
+    {
+      "billing_cycle": "monthly",
+      "created_at": "2025-09-17T12:08:58.443638",
+      "currency": "XOF",
+      "description": "Business package for growing companies",
+      "features": [
+        "All Pro features",
+        "10 companies",
+        "Advanced reporting",
+        "Priority support"
+      ],
+      "is_active": true,
+      "max_companies": 10,
+      "max_users": 15,
+      "max_workspaces": 10,
+      "name": "Business",
+      "package_id": "5b655890-682f-4ccd-9b21-f8dfcca1d3dd",
+      "package_type": "subscription",
+      "price": 25000,
+      "updated_at": "2025-09-17T12:08:58.443638"
+    },
+    {
+      "billing_cycle": "monthly",
+      "created_at": "2025-09-17T12:08:58.443638",
+      "currency": "XOF",
+      "description": "Expert package for large organizations",
+      "features": [
+        "All Business features",
+        "Unlimited companies",
+        "Custom integrations",
+        "Dedicated support"
+      ],
+      "is_active": true,
+      "max_companies": -1,
+      "max_users": -1,
+      "max_workspaces": 50,
+      "name": "Expert",
+      "package_id": "75b35ac6-7834-4978-bbcd-2d52eef28635",
+      "package_type": "subscription",
+      "price": 45000,
+      "updated_at": "2025-09-17T12:08:58.443638"
+    },
+    {
+      "billing_cycle": "monthly",
+      "created_at": "2025-09-17T12:08:58.443638",
+      "currency": "XOF",
+      "description": "Premium package with all features",
+      "features": [
+        "All Expert features",
+        "White label",
+        "API access",
+        "24/7 support"
+      ],
+      "is_active": true,
+      "max_companies": -1,
+      "max_users": -1,
+      "max_workspaces": 50,
+      "name": "Expert+",
+      "package_id": "eee03896-fa2a-4a0c-8afb-7b0b26301701",
+      "package_type": "subscription",
+      "price": 75000,
+      "updated_at": "2025-09-17T12:08:58.443638"
+    }
+  ],
+  "error": null,
+  "message": "Packages retrieved successfully",
+  "success": true
+}

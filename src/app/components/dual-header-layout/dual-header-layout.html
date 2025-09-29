@@ -1,0 +1,23 @@
+<div class="min-h-screen bg-background">
+  <!-- Header principal avec sélecteur d'entreprise -->
+  <app-main-header
+    (onMobileMenuToggle)="onMobileMenuToggle()"
+    (onViewAllNotifications)="onViewAllNotifications()"
+    (onNotificationClose)="onNotificationClose()">
+  </app-main-header>
+
+  <!-- Navigation par onglets -->
+  <app-navigation-tabs
+    [tabs]="tabs()"
+    [showMobileMenu]="showMobileMenu()"
+    (onMobileTabClick)="onMobileTabClick($event)"
+    (onMobileSubMenuClick)="onMobileSubMenuClick()"
+    (onMobileMenuClose)="onMobileMenuClose()">
+  </app-navigation-tabs>
+
+  <!-- Contenu principal -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

@@ -1,0 +1,23 @@
+{
+  "code": 200,
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIsImtpZCI6IjlJQUlxZWZIekVpNEZsRDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2doaHFpdHNyd3NvdmR3Y2dmbHRoLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxMzc1MTc3ZC01ODY4LTQ2MDYtOTY2Ni03NjA5MDRhZmI1OGMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzU4OTU1NjEzLCJpYXQiOjE3NTg5NTIwMTMsImVtYWlsIjoiYXV0ZWtrMjY2QGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJhdXRla2syNjZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJKb2huIiwibGFzdF9uYW1lIjoiRG9lIiwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiIxMzc1MTc3ZC01ODY4LTQ2MDYtOTY2Ni03NjA5MDRhZmI1OGMifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc1ODk1MjAxM31dLCJzZXNzaW9uX2lkIjoiYTBlMDlmM2QtMWI1NC00YjZhLThjODAtOWExOGRjMTNiZWYyIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.L8uyqQtfEzplrLNeni6J5uQ34xJC6C2Z-NQPeWsJRns",
+    "email": "autekk266@gmail.com",
+    "email_confirmed_at": "Mon, 22 Sep 2025 23:29:38 GMT",
+    "expires_at": 1758955613,
+    "id": "1375177d-5868-4606-9666-760904afb58c",
+    "last_sign_in_at": "Sat, 27 Sep 2025 05:46:53 GMT",
+    "refresh_token": "fy3ajo7qyfo7",
+    "user_metadata": {
+      "email": "autekk266@gmail.com",
+      "email_verified": true,
+      "first_name": "John",
+      "last_name": "Doe",
+      "phone_verified": false,
+      "sub": "1375177d-5868-4606-9666-760904afb58c"
+    }
+  },
+  "error": null,
+  "message": "Sign in successful",
+  "success": true
+}

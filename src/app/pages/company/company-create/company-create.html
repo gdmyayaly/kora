@@ -1,0 +1,600 @@
+<div class="min-h-screen bg-background">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 p-6">
+
+    <!-- Colonne gauche (1/3) - Navigation et progression -->
+    <div class="lg:col-span-4 space-y-6">
+      <!-- En-tête -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-4">
+          <button
+            (click)="onCancel()"
+            class="p-2 hover:bg-accent rounded-lg transition-colors">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <div>
+            <h1 class="text-2xl font-bold text-foreground">Créer une entreprise</h1>
+            <p class="text-muted-foreground">Étape {{ currentStep() }} sur 5 - {{ getStepTitle(currentStep()) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workspace sélectionné -->
+      <div class="bg-blue-50 dark:bg-blue-950 rounded-xl shadow-sm p-4">
+        <div class="flex items-start gap-3">
+          <i class="fas fa-users text-blue-600 dark:text-blue-400 mt-0.5"></i>
+          <div class="flex-1">
+            <h3 class="font-medium text-blue-800 dark:text-blue-200 mb-1">Workspace de destination</h3>
+            @if (selectedWorkspace()) {
+              <div class="space-y-2">
+                <span class="text-sm text-blue-700 dark:text-blue-300">
+                  Cette entreprise sera créée dans le workspace :
+                </span>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium">
+                  <i class="fas fa-users text-xs"></i>
+                  {{ selectedWorkspace()!.name }}
+                  @if (selectedWorkspace()!.is_default) {
+                    <span class="text-xs bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 rounded-full">Défaut</span>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="text-red-700 dark:text-red-300">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                Aucun workspace sélectionné. Veuillez sélectionner un workspace avant de créer une entreprise.
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Indicateur de progression -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+        <h3 class="font-medium mb-4">Progression</h3>
+        <div class="space-y-4">
+          @for (step of [1, 2, 3, 4, 5]; track step) {
+            <div class="flex items-center gap-3">
+              <!-- Cercle d'étape -->
+              <button
+                (click)="goToStep(step)"
+                [disabled]="step > currentStep() && !isStepCompleted(step - 1)"
+                class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors flex-shrink-0"
+                [class.bg-primary]="step === currentStep()"
+                [class.text-primary-foreground]="step === currentStep()"
+                [class.bg-green-500]="isStepCompleted(step)"
+                [class.text-white]="isStepCompleted(step)"
+                [class.bg-gray-200]="step > currentStep() && !isStepCompleted(step)"
+                [class.text-gray-500]="step > currentStep() && !isStepCompleted(step)"
+                [class.dark:bg-gray-700]="step > currentStep() && !isStepCompleted(step)"
+                [class.cursor-pointer]="step <= currentStep() || isStepCompleted(step - 1)"
+                [class.cursor-not-allowed]="step > currentStep() && !isStepCompleted(step - 1)">
+                @if (isStepCompleted(step)) {
+                  <i class="fas fa-check text-xs"></i>
+                } @else {
+                  {{ step }}
+                }
+              </button>
+
+              <!-- Label de l'étape -->
+              <div class="flex-1">
+                <p class="text-sm font-medium"
+                   [class.text-primary]="step === currentStep()"
+                   [class.text-green-600]="isStepCompleted(step)"
+                   [class.text-muted-foreground]="step > currentStep() && !isStepCompleted(step)">
+                  {{ getStepTitle(step) }}
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Navigation entre étapes -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            @if (currentStep() > 1) {
+              <button
+                type="button"
+                (click)="previousStep()"
+                class="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-accent transition-colors">
+                <i class="fas fa-chevron-left"></i>
+                <span>Précédent</span>
+              </button>
+            }
+          </div>
+
+          <div class="flex items-center gap-2">
+            @if (currentStep() < 5) {
+              <button
+                type="button"
+                (click)="nextStep()"
+                class="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+                <span>Suivant</span>
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne droite (2/3) - Formulaire -->
+    <div class="lg:col-span-8">
+      <div class="max-h-[calc(100vh-6rem)] overflow-y-auto">
+        <div class="space-y-6">
+
+  <!-- Formulaire -->
+  <form [formGroup]="companyForm" (ngSubmit)="onSubmit()">
+
+    <!-- Étape 1: Informations principales -->
+    @if (currentStep() === 1) {
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <i class="fas fa-building text-primary"></i>
+          Informations principales
+        </h2>
+
+        <div class="space-y-6">
+          <!-- Nom de l'entreprise -->
+          <div>
+            <label for="name" class="block text-sm font-medium mb-2">
+              Nom de l'entreprise <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              placeholder="Nom de votre entreprise"
+              [class.border-red-500]="isFieldInvalid('name')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+            @if (isFieldInvalid('name')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('name') }}</p>
+            }
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-medium mb-2">
+              Adresse email <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="contact@entreprise.com"
+              [class.border-red-500]="isFieldInvalid('email')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+            @if (isFieldInvalid('email')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('email') }}</p>
+            }
+          </div>
+
+          <!-- Téléphone -->
+          <div>
+            <label for="phone" class="block text-sm font-medium mb-2">
+              Téléphone
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              formControlName="phone"
+              placeholder="77 123 45 67 ou 221 77 123 45 67"
+              [class.border-red-500]="isFieldInvalid('phone')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+            @if (isFieldInvalid('phone')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('phone') }}</p>
+            }
+            <p class="text-muted-foreground text-sm mt-1">
+              Format sénégalais: 9 chiffres commençant par 7 ou 12 chiffres commençant par 221
+            </p>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label for="description" class="block text-sm font-medium mb-2">
+              Description
+            </label>
+            <textarea
+              id="description"
+              formControlName="description"
+              placeholder="Description de votre entreprise (optionnel)"
+              rows="3"
+              [class.border-red-500]="isFieldInvalid('description')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0 resize-none"></textarea>
+            @if (isFieldInvalid('description')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('description') }}</p>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Étape 2: Localisation -->
+    @if (currentStep() === 2) {
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <i class="fas fa-map-marker-alt text-primary"></i>
+          Localisation
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Adresse -->
+          <div class="md:col-span-2">
+            <label for="address" class="block text-sm font-medium mb-2">
+              Adresse
+            </label>
+            <input
+              id="address"
+              type="text"
+              formControlName="address"
+              placeholder="Adresse complète"
+              [class.border-red-500]="isFieldInvalid('address')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+            @if (isFieldInvalid('address')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('address') }}</p>
+            }
+          </div>
+
+          <!-- Ville -->
+          <div>
+            <label for="city" class="block text-sm font-medium mb-2">
+              Ville
+            </label>
+            <input
+              id="city"
+              type="text"
+              formControlName="city"
+              placeholder="Ville"
+              [class.border-red-500]="isFieldInvalid('city')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+            @if (isFieldInvalid('city')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('city') }}</p>
+            }
+          </div>
+
+          <!-- Code postal -->
+          <div>
+            <label for="postal_code" class="block text-sm font-medium mb-2">
+              Code postal
+            </label>
+            <input
+              id="postal_code"
+              type="text"
+              formControlName="postal_code"
+              placeholder="Code postal"
+              [class.border-red-500]="isFieldInvalid('postal_code')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+            @if (isFieldInvalid('postal_code')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('postal_code') }}</p>
+            }
+          </div>
+
+          <!-- Pays -->
+          <div class="md:col-span-2">
+            <label for="country" class="block text-sm font-medium mb-2">
+              Pays <span class="text-red-500">*</span>
+            </label>
+            <select
+              id="country"
+              formControlName="country"
+              [class.border-red-500]="isFieldInvalid('country')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+              <option value="">Sélectionner un pays</option>
+              @if (isLoadingEnums()) {
+                <option disabled>Chargement...</option>
+              } @else {
+                @for (region of Object.keys(countriesByRegion()); track region) {
+                  <optgroup [label]="region">
+                    @for (country of countriesByRegion()[region]; track country.value) {
+                      <option [value]="country.value">{{ country.label }}</option>
+                    }
+                  </optgroup>
+                }
+              }
+            </select>
+            @if (isFieldInvalid('country')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('country') }}</p>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Étape 3: Informations légales -->
+    @if (currentStep() === 3) {
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <i class="fas fa-balance-scale text-primary"></i>
+          Informations légales
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Forme juridique -->
+          <div>
+            <label for="legal_form" class="block text-sm font-medium mb-2">
+              Forme juridique <span class="text-red-500">*</span>
+            </label>
+            <select
+              id="legal_form"
+              formControlName="legal_form"
+              [class.border-red-500]="isFieldInvalid('legal_form')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+              <option value="">Sélectionner une forme juridique</option>
+              @if (isLoadingEnums()) {
+                <option disabled>Chargement...</option>
+              } @else {
+                @for (legalForm of legalForms(); track legalForm.value) {
+                  <option [value]="legalForm.value">{{ legalForm.label }}</option>
+                }
+              }
+            </select>
+            @if (isFieldInvalid('legal_form')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('legal_form') }}</p>
+            }
+          </div>
+
+          <!-- Devise -->
+          <div>
+            <label for="currency" class="block text-sm font-medium mb-2">
+              Devise <span class="text-red-500">*</span>
+            </label>
+            <select
+              id="currency"
+              formControlName="currency"
+              [class.border-red-500]="isFieldInvalid('currency')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+              <option value="">Sélectionner une devise</option>
+              @if (isLoadingEnums()) {
+                <option disabled>Chargement...</option>
+              } @else {
+                @for (currency of currencies(); track currency.value) {
+                  <option [value]="currency.value">
+                    {{ currency.label }} ({{ currency.symbol }}) - {{ currency.description }}
+                  </option>
+                }
+              }
+            </select>
+            @if (isFieldInvalid('currency')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('currency') }}</p>
+            }
+          </div>
+
+          <!-- Numéro fiscal -->
+          <div class="md:col-span-2">
+            <label for="fiscal_number" class="block text-sm font-medium mb-2">
+              Numéro fiscal
+            </label>
+            <input
+              id="fiscal_number"
+              type="text"
+              formControlName="fiscal_number"
+              placeholder="Numéro d'identification fiscale"
+              [class.border-red-500]="isFieldInvalid('fiscal_number')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+            @if (isFieldInvalid('fiscal_number')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('fiscal_number') }}</p>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Étape 4: Informations optionnelles -->
+    @if (currentStep() === 4) {
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <i class="fas fa-globe text-primary"></i>
+          Informations optionnelles
+        </h2>
+
+        <div class="space-y-6">
+          <!-- Site web -->
+          <div>
+            <label for="website" class="block text-sm font-medium mb-2">
+              Site web
+            </label>
+            <input
+              id="website"
+              type="url"
+              formControlName="website"
+              placeholder="https://www.entreprise.com"
+              [class.border-red-500]="isFieldInvalid('website')"
+              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-2 focus:ring-primary transition-colors border-0">
+            @if (isFieldInvalid('website')) {
+              <p class="text-red-500 text-sm mt-1">{{ getFieldError('website') }}</p>
+            }
+            <p class="text-muted-foreground text-sm mt-1">
+              URL complète incluant http:// ou https://
+            </p>
+          </div>
+
+          <!-- Informations sur cette étape -->
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg shadow-sm p-4">
+            <div class="flex items-start gap-3">
+              <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-0.5"></i>
+              <div>
+                <h3 class="font-medium text-gray-800 dark:text-gray-200 mb-1">Informations optionnelles</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  Ces informations ne sont pas obligatoires mais peuvent être utiles pour compléter le profil de votre entreprise.
+                  Vous pourrez les modifier à tout moment après la création.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Étape 5: Récapitulatif -->
+    @if (currentStep() === 5) {
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <i class="fas fa-clipboard-check text-primary"></i>
+          Récapitulatif
+        </h2>
+
+        <!-- Grid 2 colonnes pour le récapitulatif -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Colonne gauche -->
+          <div class="space-y-4">
+            <!-- Informations principales -->
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-medium flex items-center gap-2">
+                  <i class="fas fa-building text-sm"></i>
+                  Informations principales
+                </h3>
+                <button
+                  type="button"
+                  (click)="goToStep(1)"
+                  class="text-primary hover:text-primary/80 text-sm">
+                  <i class="fas fa-edit mr-1"></i>Modifier
+                </button>
+              </div>
+              <div class="space-y-3 text-sm">
+                <div>
+                  <span class="text-muted-foreground">Nom:</span>
+                  <p class="font-medium">{{ companyForm.get('name')?.value || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Email:</span>
+                  <p class="font-medium">{{ companyForm.get('email')?.value || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Téléphone:</span>
+                  <p class="font-medium">{{ companyForm.get('phone')?.value || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Description:</span>
+                  <p class="font-medium">{{ companyForm.get('description')?.value || '-' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Informations légales -->
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-medium flex items-center gap-2">
+                  <i class="fas fa-balance-scale text-sm"></i>
+                  Informations légales
+                </h3>
+                <button
+                  type="button"
+                  (click)="goToStep(3)"
+                  class="text-primary hover:text-primary/80 text-sm">
+                  <i class="fas fa-edit mr-1"></i>Modifier
+                </button>
+              </div>
+              <div class="space-y-3 text-sm">
+                <div>
+                  <span class="text-muted-foreground">Forme juridique:</span>
+                  <p class="font-medium">{{ companyForm.get('legal_form')?.value || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Devise:</span>
+                  <p class="font-medium">{{ companyForm.get('currency')?.value || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Numéro fiscal:</span>
+                  <p class="font-medium">{{ companyForm.get('fiscal_number')?.value || '-' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colonne droite -->
+          <div class="space-y-4">
+            <!-- Localisation -->
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-medium flex items-center gap-2">
+                  <i class="fas fa-map-marker-alt text-sm"></i>
+                  Localisation
+                </h3>
+                <button
+                  type="button"
+                  (click)="goToStep(2)"
+                  class="text-primary hover:text-primary/80 text-sm">
+                  <i class="fas fa-edit mr-1"></i>Modifier
+                </button>
+              </div>
+              <div class="space-y-3 text-sm">
+                <div>
+                  <span class="text-muted-foreground">Adresse:</span>
+                  <p class="font-medium">{{ companyForm.get('address')?.value || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Ville:</span>
+                  <p class="font-medium">{{ companyForm.get('city')?.value || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Code postal:</span>
+                  <p class="font-medium">{{ companyForm.get('postal_code')?.value || '-' }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Pays:</span>
+                  <p class="font-medium">{{ companyForm.get('country')?.value || '-' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Informations optionnelles -->
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-medium flex items-center gap-2">
+                  <i class="fas fa-globe text-sm"></i>
+                  Informations optionnelles
+                </h3>
+                <button
+                  type="button"
+                  (click)="goToStep(4)"
+                  class="text-primary hover:text-primary/80 text-sm">
+                  <i class="fas fa-edit mr-1"></i>Modifier
+                </button>
+              </div>
+              <div class="space-y-3 text-sm">
+                <div>
+                  <span class="text-muted-foreground">Site web:</span>
+                  <p class="font-medium">{{ companyForm.get('website')?.value || '-' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+          <!-- Bouton de soumission pour l'étape finale -->
+          @if (currentStep() === 5) {
+            <div class="pt-6">
+              <div class="flex items-center justify-between">
+                <button
+                  type="button"
+                  (click)="onCancel()"
+                  class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <i class="fas fa-times mr-2"></i>
+                  Annuler
+                </button>
+
+                <button
+                  type="submit"
+                  [disabled]="companyForm.invalid || isSubmitting() || !selectedWorkspace()"
+                  class="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  @if (isSubmitting()) {
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Création en cours...</span>
+                  } @else {
+                    <i class="fas fa-check"></i>
+                    <span>Créer l'entreprise</span>
+                  }
+                </button>
+              </div>
+            </div>
+          }
+
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

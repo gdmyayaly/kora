@@ -1,0 +1,63 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "description": "Individual/Sole Proprietorship",
+      "label": "Personne Physique",
+      "value": "pp"
+    },
+    {
+      "description": "Société à Responsabilité Limitée",
+      "label": "SARL",
+      "value": "sarl"
+    },
+    {
+      "description": "Société par Actions Simplifiée",
+      "label": "SAS",
+      "value": "sas"
+    },
+    {
+      "description": "Société Anonyme",
+      "label": "SA",
+      "value": "sa"
+    },
+    {
+      "description": "Société en Commandite Simple",
+      "label": "SCS",
+      "value": "scs"
+    },
+    {
+      "description": "Société en Commandite par Actions",
+      "label": "SCA",
+      "value": "sca"
+    },
+    {
+      "description": "Groupement d'Intérêt Économique",
+      "label": "GIE",
+      "value": "gie"
+    },
+    {
+      "description": "Société Civile",
+      "label": "SC",
+      "value": "sc"
+    },
+    {
+      "description": "Société en Nom Collectif",
+      "label": "SNC",
+      "value": "snc"
+    },
+    {
+      "description": "Association",
+      "label": "Association",
+      "value": "association"
+    },
+    {
+      "description": "Other",
+      "label": "Autre",
+      "value": "autre"
+    }
+  ],
+  "error": null,
+  "message": "Legal forms retrieved successfully",
+  "success": true
+}

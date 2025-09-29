@@ -1,0 +1,55 @@
+<!-- Container de toasts responsive -->
+<div class="toast-container fixed top-4 right-4 sm:right-4 sm:top-4 left-4 sm:left-auto z-50 space-y-3 pointer-events-none">
+  @for (toast of toastsWithAnimation(); track toast.id) {
+    <div
+      [class]="getToastClasses(toast)"
+      (mouseenter)="onToastMouseEnter(toast.id)"
+      (mouseleave)="onToastMouseLeave(toast.id)"
+      class="pointer-events-auto mx-auto sm:mx-0"
+      role="alert"
+      [attr.aria-live]="toast.type === 'error' ? 'assertive' : 'polite'"
+      [attr.aria-labelledby]="'toast-title-' + toast.id"
+      [attr.aria-describedby]="toast.message ? 'toast-message-' + toast.id : null">
+
+      <!-- Icône du toast -->
+      <div class="flex-shrink-0">
+        <i [class]="getToastIcon(toast.type) + ' ' + getIconClasses(toast.type)" class="text-lg"></i>
+      </div>
+
+      <!-- Contenu du toast -->
+      <div class="flex-1 min-w-0">
+        <h4 [id]="'toast-title-' + toast.id" class="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {{ toast.title }}
+        </h4>
+        @if (toast.message) {
+          <p [id]="'toast-message-' + toast.id" class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+            {{ toast.message }}
+          </p>
+        }
+      </div>
+
+      <!-- Bouton de fermeture -->
+      @if (toast.dismissible) {
+        <button
+          (click)="onDismiss(toast.id)"
+          class="flex-shrink-0 p-1 ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          [attr.aria-label]="'Fermer la notification: ' + toast.title">
+          <i class="fas fa-times text-sm"></i>
+        </button>
+      }
+
+      <!-- Barre de progression pour le timer (optionnel) -->
+      @if (toast.duration && toast.duration > 0) {
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 rounded-b-lg overflow-hidden">
+          <div class="toast-progress h-full transition-all ease-linear"
+               [class.bg-green-500]="toast.type === 'success'"
+               [class.bg-red-500]="toast.type === 'error'"
+               [class.bg-orange-500]="toast.type === 'warning'"
+               [class.bg-blue-500]="toast.type === 'info'"
+               [style.animation-duration]="toast.duration + 'ms'">
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

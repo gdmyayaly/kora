@@ -1,0 +1,129 @@
+/* Company Selector Styles */
+/* Note: .rotate-180 est géré nativement par Tailwind CSS */
+
+/* Animation pour le dropdown */
+.company-dropdown {
+  animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal overlay animation */
+.modal-overlay {
+  animation: fadeInBackdrop 0.2s ease-out;
+}
+
+.modal-content {
+  animation: slideInModal 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInModal {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* États de focus pour l'accessibilité */
+button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-color: hsl(var(--primary));
+}
+
+/* Custom scrollbar pour la liste des entreprises */
+.company-list {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+}
+
+.company-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.company-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.company-list::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .company-selector-dropdown {
+    left: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    margin: 0 1rem;
+  }
+
+  .modal-content {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+  }
+}
+
+/* Support pour les préférences de mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+  .company-dropdown,
+  .modal-overlay,
+  .modal-content {
+    animation: none;
+  }
+}
+
+/* États hover/active améliorés */
+.company-item:hover {
+  background-color: hsl(var(--accent));
+  transition: background-color 0.15s ease;
+}
+
+.company-item:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Loading spinner personnalisé */
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

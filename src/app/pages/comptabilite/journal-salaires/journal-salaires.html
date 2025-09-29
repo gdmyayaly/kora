@@ -1,0 +1,376 @@
+<div class="journal-container">
+  <!-- Header avec métriques -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1><i class="fas fa-bookmark"></i> Journal des Salaires</h1>
+        <p>Consultez toutes les écritures comptables liées aux salaires</p>
+      </div>
+      <div class="actions-section">
+        <button class="btn btn-outline" (click)="onExportJournal()">
+          <i class="fas fa-download"></i>
+          Exporter
+        </button>
+        <button class="btn btn-secondary" (click)="onSyncPayroll()">
+          <i class="fas fa-sync"></i>
+          Synchroniser paies
+        </button>
+        <button class="btn btn-primary" (click)="onCreateEntry()">
+          <i class="fas fa-plus"></i>
+          Nouvelle écriture
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Métriques rapides -->
+  <div class="metrics-grid">
+    <div class="metric-card primary" [class.animate]="showAnimations()">
+      <div class="metric-icon">
+        <i class="fas fa-receipt"></i>
+      </div>
+      <div class="metric-content">
+        <div class="metric-value">{{ payrollMetrics().totalEntries }}</div>
+        <div class="metric-label">Écritures</div>
+      </div>
+    </div>
+
+    <div class="metric-card success" [class.animate]="showAnimations()">
+      <div class="metric-icon">
+        <i class="fas fa-euro-sign"></i>
+      </div>
+      <div class="metric-content">
+        <div class="metric-value">{{ formatCurrency(payrollMetrics().totalDebit) }}</div>
+        <div class="metric-label">Masse salariale</div>
+      </div>
+    </div>
+
+    <div class="metric-card warning" [class.animate]="showAnimations()">
+      <div class="metric-icon">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <div class="metric-content">
+        <div class="metric-value">{{ formatCurrency(payrollMetrics().totalCredit) }}</div>
+        <div class="metric-label">Charges sociales</div>
+      </div>
+    </div>
+
+    <div class="metric-card info" [class.animate]="showAnimations()">
+      <div class="metric-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="metric-content">
+        <div class="metric-value">{{ formatCurrency(payrollMetrics().averageEntry) }}</div>
+        <div class="metric-label">Coût moyen</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <!-- Barre de filtres et recherche -->
+    <div class="filters-section">
+      <div class="search-bar">
+        <div class="search-input-group">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Rechercher par description, numéro d'écriture, employé..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearch()"
+          />
+        </div>
+      </div>
+
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Période</label>
+          <select class="form-control" [(ngModel)]="selectedPeriod" (change)="onFilterChange()">
+            <option value="">Toutes les périodes</option>
+            <option value="current_month">Mois actuel</option>
+            <option value="last_month">Mois dernier</option>
+            <option value="current_quarter">Trimestre actuel</option>
+            <option value="current_year">Année actuelle</option>
+            <option value="custom">Période personnalisée</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Compte</label>
+          <select class="form-control" [(ngModel)]="selectedAccount" (change)="onFilterChange()">
+            <option value="">Tous les comptes</option>
+            <option value="641">641 - Rémunérations personnel</option>
+            <option value="645">645 - Charges sociales</option>
+            <option value="647">647 - Autres charges sociales</option>
+            <option value="421">421 - Personnel à payer</option>
+            <option value="431">431 - Sécurité sociale</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Statut</label>
+          <select class="form-control" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+            <option value="">Tous les statuts</option>
+            <option value="draft">Brouillon</option>
+            <option value="posted">Comptabilisé</option>
+            <option value="pending_validation">En attente</option>
+            <option value="cancelled">Annulé</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Employé/Organisme</label>
+          <select class="form-control" [(ngModel)]="selectedThirdParty" (change)="onFilterChange()">
+            <option value="">Tous</option>
+            @for (party of uniqueThirdParties(); track party.id) {
+              <option [value]="party.id">{{ party.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Filtres avancés -->
+      @if (selectedPeriod() === 'custom') {
+        <div class="advanced-filters" [@slideDown]>
+          <div class="date-range">
+            <div class="form-group">
+              <label>Date début</label>
+              <input type="date" class="form-control" [(ngModel)]="dateFrom" (change)="onFilterChange()">
+            </div>
+            <div class="form-group">
+              <label>Date fin</label>
+              <input type="date" class="form-control" [(ngModel)]="dateTo" (change)="onFilterChange()">
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (hasActiveFilters()) {
+        <div class="active-filters">
+          <span class="filters-count">{{ getActiveFiltersCount() }} filtre(s) actif(s)</span>
+          <button class="btn btn-link btn-sm" (click)="onClearFilters()">
+            <i class="fas fa-times"></i>
+            Effacer les filtres
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Actions en lot -->
+    @if (selectedEntries().length > 0) {
+      <div class="bulk-actions" [@slideDown]>
+        <div class="bulk-info">
+          <span>{{ selectedEntries().length }} écriture(s) sélectionnée(s)</span>
+        </div>
+        <div class="bulk-buttons">
+          <button class="btn btn-outline" (click)="onBulkExport()">
+            <i class="fas fa-download"></i>
+            Exporter sélection
+          </button>
+          <button class="btn btn-danger" (click)="onBulkDelete()">
+            <i class="fas fa-trash"></i>
+            Supprimer
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Table des écritures -->
+    <div class="table-section">
+      <div class="table-header">
+        <div class="table-info">
+          <span>{{ filteredEntries().length }} écriture(s) trouvée(s)</span>
+        </div>
+        <div class="table-actions">
+          <select class="form-control page-size-select" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+            <option value="10">10 par page</option>
+            <option value="25">25 par page</option>
+            <option value="50">50 par page</option>
+            <option value="100">100 par page</option>
+          </select>
+        </div>
+      </div>
+
+      @if (paginatedEntries().length > 0) {
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="checkbox-col">
+                  <input
+                    type="checkbox"
+                    [checked]="allSelected()"
+                    [indeterminate]="someSelected()"
+                    (change)="toggleAllSelection($event)"
+                  />
+                </th>
+                <th class="sortable" (click)="onSort('date')">
+                  Date
+                  <i class="fas" [class]="getSortIcon('date')"></i>
+                </th>
+                <th class="sortable" (click)="onSort('entryNumber')">
+                  N° écriture
+                  <i class="fas" [class]="getSortIcon('entryNumber')"></i>
+                </th>
+                <th class="sortable" (click)="onSort('description')">
+                  Description
+                  <i class="fas" [class]="getSortIcon('description')"></i>
+                </th>
+                <th class="sortable" (click)="onSort('account')">
+                  Compte
+                  <i class="fas" [class]="getSortIcon('account')"></i>
+                </th>
+                <th class="sortable" (click)="onSort('thirdParty')">
+                  Employé/Organisme
+                  <i class="fas" [class]="getSortIcon('thirdParty')"></i>
+                </th>
+                <th class="sortable amount-col" (click)="onSort('debit')">
+                  Débit
+                  <i class="fas" [class]="getSortIcon('debit')"></i>
+                </th>
+                <th class="sortable amount-col" (click)="onSort('credit')">
+                  Crédit
+                  <i class="fas" [class]="getSortIcon('credit')"></i>
+                </th>
+                <th>Statut</th>
+                <th class="actions-col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of paginatedEntries(); track entry.id) {
+                <tr
+                  class="table-row"
+                  [class.selected]="isSelected(entry.id)"
+                  (click)="onRowClick(entry)"
+                >
+                  <td class="checkbox-col" (click)="$event.stopPropagation()">
+                    <input
+                      type="checkbox"
+                      [checked]="isSelected(entry.id)"
+                      (change)="toggleSelection(entry.id)"
+                    />
+                  </td>
+                  <td class="date-col">{{ formatDate(entry.date) }}</td>
+                  <td class="entry-number">{{ entry.entryNumber }}</td>
+                  <td class="description">
+                    <div class="description-content">
+                      {{ entry.description }}
+                      @if (entry.reference) {
+                        <span class="reference">{{ entry.reference }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="account">
+                    <div class="account-info">
+                      <span class="account-number">{{ entry.account }}</span>
+                      <span class="account-name">{{ entry.accountName }}</span>
+                    </div>
+                  </td>
+                  <td class="third-party">{{ entry.thirdPartyName || '-' }}</td>
+                  <td class="amount debit">
+                    @if (entry.debit > 0) {
+                      {{ formatCurrency(entry.debit) }}
+                    } @else {
+                      -
+                    }
+                  </td>
+                  <td class="amount credit">
+                    @if (entry.credit > 0) {
+                      {{ formatCurrency(entry.credit) }}
+                    } @else {
+                      -
+                    }
+                  </td>
+                  <td class="status">
+                    <span class="status-badge" [class]="getStatusBadgeClass(entry.status)">
+                      {{ getStatusLabel(entry.status) }}
+                    </span>
+                  </td>
+                  <td class="actions" (click)="$event.stopPropagation()">
+                    <div class="action-buttons">
+                      <button class="btn-icon" (click)="onViewEntry(entry)" title="Voir">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn-icon" (click)="onEditEntry(entry)" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn-icon delete" (click)="onDeleteEntry(entry)" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <div class="pagination-section">
+            <div class="pagination-info">
+              {{ (currentPage() - 1) * pageSize() + 1 }} -
+              {{ Math.min(currentPage() * pageSize(), filteredEntries().length) }}
+              sur {{ filteredEntries().length }} écriture(s)
+            </div>
+            <div class="pagination-controls">
+              <button
+                class="btn btn-outline btn-sm"
+                [disabled]="currentPage() === 1"
+                (click)="setPage(currentPage() - 1)"
+              >
+                <i class="fas fa-chevron-left"></i>
+                Précédent
+              </button>
+
+              @for (page of getPageNumbers(); track page) {
+                @if (page === '...') {
+                  <span class="pagination-ellipsis">...</span>
+                } @else {
+                  <button
+                    class="btn btn-sm"
+                    [class.btn-primary]="page === currentPage()"
+                    [class.btn-outline]="page !== currentPage()"
+                    (click)="page !== '...' && setPage(page)"
+                  >
+                    {{ page }}
+                  </button>
+                }
+              }
+
+              <button
+                class="btn btn-outline btn-sm"
+                [disabled]="currentPage() === totalPages()"
+                (click)="setPage(currentPage() + 1)"
+              >
+                Suivant
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-bookmark fa-3x"></i>
+          </div>
+          <h3>Aucune écriture trouvée</h3>
+          @if (hasActiveFilters()) {
+            <p>Aucune écriture ne correspond aux filtres sélectionnés.</p>
+            <button class="btn btn-outline" (click)="onClearFilters()">
+              <i class="fas fa-times"></i>
+              Effacer les filtres
+            </button>
+          } @else {
+            <p>Les écritures de salaire apparaîtront ici une fois saisies.</p>
+            <button class="btn btn-primary" (click)="onCreateEntry()">
+              <i class="fas fa-plus"></i>
+              Créer la première écriture
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

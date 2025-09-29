@@ -1,0 +1,68 @@
+/* Animations pour les transitions */
+.transition-shadow {
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.transition-colors {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* Animation pour l'icône de chargement */
+.fa-spin {
+  animation: fa-spin 1s infinite linear;
+}
+
+/* Amélioration de l'accessibilité pour les boutons */
+button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Style pour les badges de statut */
+.status-badge {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Responsive pour les cartes */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/* Style pour la table responsive */
+@media (max-width: 640px) {
+  table {
+    font-size: 0.875rem;
+  }
+
+  th, td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+/* Amélioration du hover sur les lignes de tableau */
+tbody tr:hover {
+  background-color: hsl(var(--muted) / 0.3);
+}
+
+/* Animation pour les cartes utilisateur */
+.user-card {
+  transform: translateY(0);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Style pour les avatars */
+.avatar-initials {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+}
+
+/* Animation douce pour les changements d'état */
+.status-transition {
+  transition: all 0.3s ease-in-out;
+}

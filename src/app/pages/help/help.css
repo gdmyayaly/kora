@@ -1,0 +1,41 @@
+/* Animations et styles spécifiques pour la page d'aide */
+.search-input:focus {
+  transform: scale(1.02);
+}
+
+.help-section {
+  transition: all 0.3s ease;
+}
+
+.help-section:hover {
+  transform: translateY(-2px);
+}
+
+.faq-item {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.faq-item:hover {
+  background-color: var(--muted);
+}
+
+/* Animation pour les icônes */
+.help-icon {
+  transition: transform 0.3s ease;
+}
+
+.help-section:hover .help-icon {
+  transform: scale(1.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .help-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .help-section {
+    padding: 1rem;
+  }
+}

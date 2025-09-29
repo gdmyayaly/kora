@@ -1,0 +1,151 @@
+<!-- Premier Header : Logo, Sélecteur d'entreprise, Actions utilisateur -->
+<header class="sticky top-0 z-50 bg-card border-b shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 py-3">
+    <div class="flex items-center justify-between">
+      <!-- Logo, Entreprise, Burger Mobile -->
+      <div class="flex items-center gap-4 flex-1">
+        <!-- Bouton burger mobile -->
+        <button
+          class="burger-btn lg:hidden p-2 hover:bg-accent rounded-lg transition-colors"
+          (click)="onMobileMenuClick()"
+          data-mobile-menu
+          [attr.aria-expanded]="showMobileMenu()"
+          aria-label="Menu navigation">
+          <div class="burger-icon flex flex-col gap-1.5">
+            <span class="burger-line w-5 h-0.5 bg-foreground transition-all duration-300"
+                  [class.rotate-45]="showMobileMenu()"
+                  [class.translate-y-2]="showMobileMenu()"></span>
+            <span class="burger-line w-5 h-0.5 bg-foreground transition-all duration-300"
+                  [class.opacity-0]="showMobileMenu()"></span>
+            <span class="burger-line w-5 h-0.5 bg-foreground transition-all duration-300"
+                  [class.-rotate-45]="showMobileMenu()"
+                  [class.-translate-y-2]="showMobileMenu()"></span>
+          </div>
+        </button>
+
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 flex items-center justify-center">
+            <a routerLink="/dashboard" >
+              <img
+                [src]="themeService.isDark() ? '/logo/kora_dark.svg' : '/logo/kora_light.svg'"
+                alt="Kora Logo"
+                class="w-10 h-10 object-contain transition-opacity duration-300"
+              />
+            </a>
+          </div>
+        </div>
+
+        <!-- Sélecteurs Workspace et Entreprise -->
+        <div class="hidden sm:flex items-center gap-3">
+          <app-workspace-selector
+            [forceClose]="forceCloseWorkspaceSelector()"
+            (onDropdownToggle)="onWorkspaceSelectorToggle($event)">
+          </app-workspace-selector>
+          <app-company-selector
+            [forceClose]="forceCloseCompanySelector()"
+            (onDropdownToggle)="onCompanySelectorToggle($event)">
+          </app-company-selector>
+        </div>
+      </div>
+
+      <!-- Actions utilisateur -->
+      <div class="flex items-center gap-4">
+        <!-- Badge période d'essai -->
+        @if (isTrialUser()) {
+          <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 rounded-lg border border-amber-200 dark:border-amber-800">
+            <i class="fas fa-clock text-amber-600 dark:text-amber-400 text-sm"></i>
+            <span class="text-amber-800 dark:text-amber-200 text-xs font-medium">
+              Expire le {{ getTrialExpirationDate() }}
+            </span>
+          </div>
+        }
+
+        <!-- Bouton Payer (période d'essai) -->
+        @if (isTrialUser()) {
+          <button
+            (click)="onNavigateToPayment()"
+            class="flex items-center gap-2 px-3 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors text-sm font-medium">
+            <i class="fas fa-credit-card text-sm"></i>
+            <span class="hidden sm:inline">Payer</span>
+          </button>
+        }
+
+        <!-- Notifications (Desktop seulement) -->
+        <div class="hidden lg:block">
+          <app-notification-dropdown
+            (onViewAll)="onViewAllNotificationsClick()"
+            (onClose)="onNotificationCloseClick()">
+          </app-notification-dropdown>
+        </div>
+
+        <!-- Fullscreen -->
+        @if (fullscreenService.isFullscreenAvailable()) {
+          <button
+            class="p-2 hover:bg-accent rounded-lg transition-colors"
+            (click)="onToggleFullscreen()"
+            [title]="fullscreenService.isFullscreen() ? 'Quitter plein écran' : 'Mode plein écran'">
+            <i [class]="fullscreenService.isFullscreen() ? 'fas fa-compress' : 'fas fa-expand'" class="text-lg"></i>
+          </button>
+        }
+
+        <!-- Thème -->
+        <button
+          class="p-2 hover:bg-accent rounded-lg transition-colors relative"
+          (click)="onToggleTheme($event)"
+          [title]="themeService.isDark() ? 'Mode clair' : 'Mode sombre'"
+          #themeToggle>
+          <i [class]="themeService.isDark() ? 'fas fa-sun' : 'fas fa-moon'" class="text-lg transition-transform"></i>
+        </button>
+
+        <!-- Profil utilisateur -->
+        <div class="relative" data-dropdown="user">
+          <button class="flex items-center gap-2 p-2 hover:bg-accent rounded-lg transition-colors"
+                  (click)="onUserDropdownToggle()">
+            <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+              @if (authService.user()?.avatar) {
+                <img [src]="authService.user()?.avatar" [alt]="authService.user()?.name" class="w-full h-full rounded-full object-cover">
+              } @else {
+                <span class="text-primary-foreground text-sm font-medium">
+                  {{ (authService.user()?.firstName?.charAt(0) || '') + (authService.user()?.lastName?.charAt(0) || '') }}
+                </span>
+              }
+            </div>
+            <span class="hidden sm:block text-sm font-medium">{{ authService.user()?.name || 'Utilisateur' }}</span>
+            <i class="fas fa-chevron-down text-xs"></i>
+          </button>
+
+          <!-- Dropdown profil -->
+          @if (showUserDropdown()) {
+            <div class="absolute right-0 top-full mt-2 w-48 bg-card rounded-lg shadow-2xl backdrop-blur-sm z-50">
+              <div class="p-2">
+                <button
+                  (click)="onNavigateToProfile()"
+                  class="flex items-center gap-2 p-2 hover:bg-accent rounded text-sm w-full text-left">
+                  <i class="fas fa-user w-4"></i>
+                  <span>Mon profil</span>
+                </button>
+                <a routerLink="/settings" class="flex items-center gap-2 p-2 hover:bg-accent rounded text-sm">
+                  <i class="fas fa-cog w-4"></i>
+                  <span>Paramètres</span>
+                </a>
+                <a routerLink="/help" class="flex items-center gap-2 p-2 hover:bg-accent rounded text-sm">
+                  <i class="fas fa-question-circle w-4"></i>
+                  <span>Aide</span>
+                </a>
+                <div class="border-t my-2"></div>
+                <button
+                  (click)="onLogout()"
+                  class="flex items-center gap-2 p-2 hover:bg-accent rounded text-sm text-destructive w-full text-left">
+                  <i class="fas fa-sign-out-alt w-4"></i>
+                  <span>Déconnexion</span>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+

@@ -1,0 +1,278 @@
+<div class="page-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div>
+        <h1>Gestion des Clients</h1>
+        <p>Gérez votre portefeuille client et leurs informations</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="onRefresh()">
+          <i class="fas fa-sync-alt"></i>
+          Actualiser
+        </button>
+        <button class="btn btn-primary" (click)="onCreateCustomer()">
+          <i class="fas fa-plus"></i>
+          Nouveau client
+        </button>
+      </div>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ metrics().total }}</div>
+          <div class="metric-label">Total Clients</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon active">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ metrics().active }}</div>
+          <div class="metric-label">Clients Actifs</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon prospect">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ metrics().prospects }}</div>
+          <div class="metric-label">Prospects</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon new">
+          <i class="fas fa-calendar-plus"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ metrics().newThisMonth }}</div>
+          <div class="metric-label">Nouveaux ce mois</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Controls -->
+  <div class="controls-section">
+    <div class="filters">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          placeholder="Rechercher un client..."
+          [value]="searchTerm()"
+          (input)="onSearchChange($event)"
+        />
+      </div>
+
+      <select
+        class="filter-select"
+        [value]="selectedStatus()"
+        (change)="onStatusFilterChange($event)"
+      >
+        <option value="all">Tous les statuts</option>
+        <option value="active">Actif</option>
+        <option value="inactive">Inactif</option>
+        <option value="prospect">Prospect</option>
+      </select>
+
+      <select
+        class="filter-select"
+        [value]="selectedCategory()"
+        (change)="onCategoryFilterChange($event)"
+      >
+        <option value="all">Toutes les catégories</option>
+        <option value="retail">Détail</option>
+        <option value="wholesale">Gros</option>
+        <option value="enterprise">Entreprise</option>
+        <option value="government">Gouvernement</option>
+      </select>
+    </div>
+
+    <div class="view-controls">
+      <div class="view-mode-toggle">
+        <button
+          class="view-btn"
+          [class.active]="viewMode() === 'grid'"
+          (click)="onViewModeChange('grid')"
+        >
+          <i class="fas fa-th-large"></i>
+        </button>
+        <button
+          class="view-btn"
+          [class.active]="viewMode() === 'list'"
+          (click)="onViewModeChange('list')"
+        >
+          <i class="fas fa-list"></i>
+        </button>
+      </div>
+
+      <button class="btn btn-outline" (click)="onExportExcel()">
+        <i class="fas fa-file-excel"></i>
+        Exporter Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="content-section">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Chargement des clients...</p>
+      </div>
+    } @else if (filteredCustomers().length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-users fa-3x"></i>
+        <h3>Aucun client trouvé</h3>
+        <p>
+          @if (searchTerm() || selectedStatus() !== 'all' || selectedCategory() !== 'all') {
+            Aucun client ne correspond à vos critères de recherche.
+          } @else {
+            Commencez par ajouter votre premier client.
+          }
+        </p>
+        @if (!searchTerm() && selectedStatus() === 'all' && selectedCategory() === 'all') {
+          <button class="btn btn-primary" (click)="onCreateCustomer()">
+            <i class="fas fa-plus"></i>
+            Créer un client
+          </button>
+        }
+      </div>
+    } @else {
+      @if (viewMode() === 'grid') {
+        <!-- Grid View -->
+        <div class="customers-grid">
+          @for (customer of filteredCustomers(); track customer.id) {
+            <div class="customer-card" [attr.data-status]="customer.status">
+              <div class="card-header">
+                <div class="customer-avatar">
+                  {{ getCustomerInitials(customer) }}
+                </div>
+                <div class="customer-status">
+                  <span class="status-badge" [attr.data-status]="customer.status">
+                    {{ getStatusLabel(customer.status) }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-content">
+                <h3 class="customer-name">{{ customer.name }}</h3>
+                <p class="customer-contact">{{ customer.contactPerson }}</p>
+                <p class="customer-email">{{ customer.email }}</p>
+                <p class="customer-location">
+                  <i class="fas fa-map-marker-alt"></i>
+                  {{ customer.address.city }}, {{ customer.address.country }}
+                </p>
+
+                <div class="customer-stats">
+                  <div class="stat">
+                    <span class="stat-label">CA Total</span>
+                    <span class="stat-value">{{ formatCurrency(customer.totalSales) }}</span>
+                  </div>
+                  <div class="stat">
+                    <span class="stat-label">Catégorie</span>
+                    <span class="stat-value">{{ getCategoryLabel(customer.category) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-actions">
+                <button class="action-btn" (click)="onEditCustomer(customer)" title="Modifier">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="action-btn"
+                  (click)="onToggleCustomerStatus(customer)"
+                  [title]="customer.status === 'active' ? 'Désactiver' : 'Activer'"
+                >
+                  <i class="fas" [class.fa-pause]="customer.status === 'active'" [class.fa-play]="customer.status !== 'active'"></i>
+                </button>
+                <button class="action-btn danger" (click)="onDeleteCustomer(customer)" title="Supprimer">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- List View -->
+        <div class="customers-table-container">
+          <table class="customers-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Contact</th>
+                <th>Localisation</th>
+                <th>Statut</th>
+                <th>Catégorie</th>
+                <th>CA Total</th>
+                <th>Dernière vente</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (customer of filteredCustomers(); track customer.id) {
+                <tr [attr.data-status]="customer.status">
+                  <td class="customer-info">
+                    <div class="customer-avatar small">
+                      {{ getCustomerInitials(customer) }}
+                    </div>
+                    <div>
+                      <div class="customer-name">{{ customer.name }}</div>
+                      <div class="customer-email">{{ customer.email }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>{{ customer.contactPerson }}</div>
+                    <div class="text-muted">{{ customer.phone }}</div>
+                  </td>
+                  <td>
+                    <div>{{ customer.address.city }}</div>
+                    <div class="text-muted">{{ customer.address.country }}</div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [attr.data-status]="customer.status">
+                      {{ getStatusLabel(customer.status) }}
+                    </span>
+                  </td>
+                  <td>{{ getCategoryLabel(customer.category) }}</td>
+                  <td class="currency">{{ formatCurrency(customer.totalSales) }}</td>
+                  <td>
+                    @if (customer.lastSale) {
+                      {{ customer.lastSale | date:'dd/MM/yyyy' }}
+                    } @else {
+                      <span class="text-muted">Aucune</span>
+                    }
+                  </td>
+                  <td class="table-actions">
+                    <button class="action-btn" (click)="onEditCustomer(customer)" title="Modifier">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      class="action-btn"
+                      (click)="onToggleCustomerStatus(customer)"
+                      [title]="customer.status === 'active' ? 'Désactiver' : 'Activer'"
+                    >
+                      <i class="fas" [class.fa-pause]="customer.status === 'active'" [class.fa-play]="customer.status !== 'active'"></i>
+                    </button>
+                    <button class="action-btn danger" (click)="onDeleteCustomer(customer)" title="Supprimer">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+</div>

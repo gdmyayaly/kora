@@ -1,0 +1,180 @@
+/* Container principal des toasts */
+.toast-container {
+  max-width: 400px;
+}
+
+/* Responsive pour mobile */
+@media (max-width: 640px) {
+  .toast-container {
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+/* Styles de base pour les toasts */
+.toast-item {
+  position: relative;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Animations d'entrée */
+.toast-enter {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Animations de sortie */
+.toast-exit {
+  animation: slideOutRight 0.3s ease-in;
+}
+
+/* Keyframes pour les animations */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+/* Animation mobile - slide depuis le haut */
+@media (max-width: 640px) {
+  .toast-enter {
+    animation: slideInDown 0.3s ease-out;
+  }
+
+  .toast-exit {
+    animation: slideOutUp 0.3s ease-in;
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOutUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+/* Barre de progression */
+.toast-progress {
+  animation-name: progressBar;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Pause l'animation au hover */
+.toast-item:hover .toast-progress {
+  animation-play-state: paused;
+}
+
+/* Effet de hover sur le toast */
+.toast-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Accessibilité - respect des préférences de mouvement */
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter,
+  .toast-exit {
+    animation: none;
+  }
+
+  .toast-item {
+    transition: none;
+  }
+
+  .toast-progress {
+    animation: none;
+  }
+}
+
+/* Amélioration du contraste en mode dark */
+@media (prefers-color-scheme: dark) {
+  .toast-item {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* Responsive design pour tablettes */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .toast-container {
+    right: 1rem;
+    max-width: 350px;
+  }
+}
+
+/* Ajustements pour très petits écrans */
+@media (max-width: 375px) {
+  .toast-container {
+    left: 0.5rem;
+    right: 0.5rem;
+  }
+
+  .toast-item {
+    padding: 0.75rem;
+  }
+}
+
+/* Style pour les toasts empilés */
+.toast-container .toast-item:not(:first-child) {
+  margin-top: 0.75rem;
+}
+
+/* Effet de focus pour l'accessibilité */
+.toast-item button:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Animation de pulse pour attirer l'attention (erreurs) */
+.toast-item.error-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

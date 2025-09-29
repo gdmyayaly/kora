@@ -1,0 +1,81 @@
+<div class="relative">
+  <!-- Bouton principal -->
+  <button
+    class="flex items-center gap-2 px-3 py-2 bg-accent/50 hover:bg-accent/80 rounded-lg transition-colors text-sm shadow-sm hover:shadow-md"
+    (click)="toggleDropdown()"
+    [disabled]="isLoading()">
+
+    @if (isLoading()) {
+      <i class="fas fa-spinner fa-spin text-sm"></i>
+    } @else {
+      <i [class]="getDisplayIcon()" class="text-sm"></i>
+    }
+
+    <span class="font-medium">{{ getDisplayName() }}</span>
+    <i class="fas fa-chevron-down text-xs transition-transform duration-300 ease-in-out"
+       [class.rotate-180]="showDropdown()"></i>
+  </button>
+
+  <!-- Dropdown -->
+  @if (showDropdown()) {
+    <div class="absolute top-full left-0 mt-2 w-80 bg-card rounded-lg shadow-2xl z-50 backdrop-blur-sm border border-border/50">
+      @if (hasCompanies()) {
+        <!-- Liste des entreprises -->
+        <div class="p-2 max-h-64 overflow-y-auto">
+          <div class="mb-2 px-2 py-1 text-xs font-medium text-muted-foreground">
+            Entreprises disponibles
+          </div>
+
+          @for (company of companies(); track company.company_id) {
+            <button
+              (click)="onSelectCompany(company)"
+              class="flex items-center gap-3 w-full p-2 hover:bg-accent rounded text-sm text-left"
+              [class.bg-accent]="selectedCompany()?.company_id === company.company_id">
+              <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-building text-primary text-xs"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-medium truncate">{{ company.name }}</div>
+                <div class="text-xs text-muted-foreground truncate">{{ company.email }}</div>
+              </div>
+              @if (selectedCompany()?.company_id === company.company_id) {
+                <i class="fas fa-check text-primary text-sm"></i>
+              }
+            </button>
+          }
+
+          <div class="border-t my-2"></div>
+          <button
+            (click)="onViewAllCompanies()"
+            class="flex items-center gap-2 w-full p-2 hover:bg-accent rounded text-sm mb-1">
+            <i class="fas fa-list"></i>
+            <span>Voir toutes les entreprises</span>
+          </button>
+          <button
+            (click)="onCreateCompany()"
+            class="flex items-center gap-2 w-full p-2 hover:bg-accent rounded text-sm text-primary">
+            <i class="fas fa-plus"></i>
+            <span>Créer une nouvelle entreprise</span>
+          </button>
+        </div>
+      } @else {
+        <!-- Aucune entreprise -->
+        <div class="p-4 text-center">
+          <div class="mb-3">
+            <i class="fas fa-building text-3xl text-muted-foreground/50"></i>
+          </div>
+          <h3 class="font-medium mb-1">Aucune entreprise</h3>
+          <p class="text-sm text-muted-foreground mb-3">
+            Créez votre première entreprise pour commencer
+          </p>
+          <button
+            (click)="onCreateCompany()"
+            class="w-full flex items-center justify-center gap-2 p-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+            <i class="fas fa-plus"></i>
+            <span>Créer une entreprise</span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,55 @@
+{
+  "code": 200,
+  "data": {
+    "auth_data": {
+      "app_metadata": {
+        "provider": "email",
+        "providers": [
+          "email"
+        ]
+      },
+      "created_at": "2025-09-22 23:28:31.835556+00:00",
+      "email": "autekk266@gmail.com",
+      "email_verified": true,
+      "id": "1375177d-5868-4606-9666-760904afb58c",
+      "phone": "",
+      "phone_verified": false,
+      "updated_at": "2025-09-27 09:02:37.007694+00:00",
+      "user_metadata": {
+        "email": "autekk266@gmail.com",
+        "email_verified": true,
+        "first_name": "John",
+        "last_name": "Doe",
+        "phone_verified": false,
+        "sub": "1375177d-5868-4606-9666-760904afb58c"
+      }
+    },
+    "profile_data": {
+      "address_line1": null,
+      "address_line2": null,
+      "city": null,
+      "country": null,
+      "created_at": "2025-09-22T23:28:31.835195+00:00",
+      "display_name": "John Doe",
+      "email": "autekk266@gmail.com",
+      "first_name": "John",
+      "is_active": true,
+      "is_first_login": true,
+      "last_name": "Doe",
+      "onboarding_completed": false,
+      "package_id": "9e94b4e2-f9ae-477e-a191-65538a430c2f",
+      "phone": null,
+      "postal_code": null,
+      "profile_id": "1375177d-5868-4606-9666-760904afb58c",
+      "status": "active",
+      "subscription_expires_at": "2025-10-23T04:28:53.823881+00:00",
+      "subscription_status": "trial",
+      "total_companies_created": 1,
+      "updated_at": "2025-09-23T04:28:52.350489+00:00"
+    },
+    "user_id": "1375177d-5868-4606-9666-760904afb58c"
+  },
+  "error": null,
+  "message": "Current user retrieved successfully",
+  "success": true
+}

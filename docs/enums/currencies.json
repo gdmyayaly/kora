@@ -1,0 +1,44 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "description": "West African CFA Franc",
+      "label": "XOF",
+      "symbol": "CFA",
+      "value": "XOF"
+    },
+    {
+      "description": "US Dollar",
+      "label": "USD",
+      "symbol": "$",
+      "value": "USD"
+    },
+    {
+      "description": "Euro",
+      "label": "EUR",
+      "symbol": "€",
+      "value": "EUR"
+    },
+    {
+      "description": "British Pound",
+      "label": "GBP",
+      "symbol": "£",
+      "value": "GBP"
+    },
+    {
+      "description": "Canadian Dollar",
+      "label": "CAD",
+      "symbol": "C$",
+      "value": "CAD"
+    },
+    {
+      "description": "Swiss Franc",
+      "label": "CHF",
+      "symbol": "CHF",
+      "value": "CHF"
+    }
+  ],
+  "error": null,
+  "message": "Currencies retrieved successfully",
+  "success": true
+}
