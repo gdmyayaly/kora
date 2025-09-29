@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  korametrics-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        BUILD_CONFIGURATION: production
+    container_name: korametrics-prod
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - korametrics-network
+    labels:
+      - "com.docker.compose.service=korametrics"
+      - "com.docker.compose.version=1.0.0"
+
+networks:
+  korametrics-network:
+    driver: bridge

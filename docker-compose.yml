@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  korametrics-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: korametrics-dev
+    ports:
+      - "4200:4200"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run start -- --host 0.0.0.0 --port 4200
+    restart: unless-stopped
+    networks:
+      - korametrics-network
+
+networks:
+  korametrics-network:
+    driver: bridge
